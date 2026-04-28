@@ -54,13 +54,13 @@ function calculateFinalScore(country, liveAqi) {
     
     if (raw.passport_vfs < 45) {
         totalScore -= 70;
-        isolationPenaltyText = '*Extreme Isolation Penalty applied (-70)';
+        isolationPenaltyText = '*Extreme Inaccessibility Penalty applied (-70)';
     } else if (raw.passport_vfs < 50) {
         totalScore -= 45;
-        isolationPenaltyText = '*High Isolation Penalty applied (-45)';
+        isolationPenaltyText = '*High Inaccesibility Penalty applied (-45)';
     } else if (raw.passport_vfs < 58) {
         totalScore -= 15;
-        isolationPenaltyText = '*Moderate Isolation Penalty applied (-15)';
+        isolationPenaltyText = '*Moderate Inaccesibility Penalty applied (-15)';
     }
 
     // Ensure the score doesn't drop below 0 to keep the UI clean
@@ -107,17 +107,17 @@ function renderList(rankedCountries) {
         let statusText = '';
         let statusClass = '';
         
-        if (c.final_score >= 80) {
+        if (c.final_score >= 85) {
             statusText = '(Highly Recommended)';
             statusClass = 'status-highly-recommended';
         } else if (c.final_score >= 70) {
             statusText = '(Okay to Visit)';
             statusClass = 'status-okay';
-        } else if (c.final_score >= 60) {
+        } else if (c.final_score >= 62) {
             statusText = '(Avoid Visiting)';
             statusClass = 'status-avoid';
         } else {
-            statusText = '(High Risk)';
+            statusText = '(DO NOT VISIT)';
             statusClass = 'status-danger';
         }
         
