@@ -88,16 +88,8 @@ async function fetchLiveAQI(isoCode) {
     // Convert the hash to an absolute number between 15 and 95
     const mockAqi = Math.abs(hash % 80) + 15;
     return mockAqi;
-}
-
-// --- 4. ACCORDION TOGGLE ---
-function toggleDetails(element) {
-    // Finds the next sibling element (the details div) and toggles the 'show' class
-    const detailsDiv = element.nextElementSibling;
-    detailsDiv.classList.toggle('show');
-}
-
-// --- 5. RENDER TO DOM ---
+} 
+// --- 4. RENDER TO DOM ---
 function renderList(rankedCountries) {
     const container = document.getElementById('results-container');
     document.getElementById('loading').style.display = 'none';
@@ -127,22 +119,35 @@ function renderList(rankedCountries) {
             statusClass = 'status-danger';
         }
         
+        // Removed the inline onclick from the card-header
         html += `
             <div class="country-card">
-                <div>
-                    <h2>#${index + 1} ${c.country} <span class="${statusClass}" style="font-size: 1rem; margin-left: 10px;">${statusText}</span></h2>
-                    <div class="details">
-                        General Risk (Higher is Worse): ${c.scores_raw.gpi} | Geopolitical Situation Risk (Higher is Worse): ${c.scores_raw.gti} | Diplomacy Score (Higher is better): ${c.scores_raw.passport_vfs} | Homicides per 100K (Higher is worse): ${c.scores_raw.homicide_rate}  | Sexual Crime Risk (Higher is worse) (Global Average is 40): ${c.scores_raw.rape_rate} 
-                        ${femicideText}
-                        ${isolationText}
-                    </div>
+                <div class="card-header">
+                    <h2 style="margin: 0;">#${index + 1} ${c.country} <span class="${statusClass}" style="font-size: 1rem; margin-left: 10px;">${statusText}</span></h2>
+                    <div class="score">${c.final_score}</div>
                 </div>
-                <div class="score">${c.final_score}</div>
+                <div class="details">
+                    General Risk (Higher is Worse): ${c.scores_raw.gpi} | Geopolitical Situation Risk (Higher is Worse): ${c.scores_raw.gti} | Diplomacy Score (Higher is better): ${c.scores_raw.passport_vfs} | Homicides per 100K (Higher is worse): ${c.scores_raw.homicide_rate} | Sexual Crime Risk (Higher is worse) (Global Average is 40): ${c.scores_raw.rape_rate} 
+                    ${femicideText}
+                    ${isolationText}
+                </div>
             </div>
         `;
     });
     
     container.innerHTML = html;
+
+    // --- ACCORDION EVENT LISTENERS ---
+    // Attach click events natively after the HTML is injected
+    const headers = document.querySelectorAll('.card-header');
+    headers.forEach(header => {
+        header.addEventListener('click', function() {
+            // Find the details div immediately following the clicked header
+            const detailsDiv = this.nextElementSibling;
+            // Toggle the visibility class
+            detailsDiv.classList.toggle('show');
+        });
+    });
 }
 
 // --- 6. INITIALIZATION ---
