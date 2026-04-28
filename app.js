@@ -47,7 +47,7 @@ function calculateFinalScore(country, liveAqi) {
         (diplomacyScore * WEIGHTS.diplomacy) +
         (aqiScore * WEIGHTS.aqi) +
         (homicideScore * finalHomicideWeight) +
-        (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35 * 10);
+        (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35);
 
     // --- NEW: Isolation / Diplomacy Penalty ---
     let isolationPenaltyText = '';
@@ -126,7 +126,7 @@ function renderList(rankedCountries) {
                 <div>
                     <h2>#${index + 1} ${c.country} <span class="${statusClass}" style="font-size: 1rem; margin-left: 10px;">${statusText}</span></h2>
                     <div class="details">
-                        General Danger: ${c.scores_raw.gpi} | Geopolitcal Situation Danger: ${c.scores_raw.gti} | Diplomacy Score: ${c.scores_raw.passport_vfs} | Homicides per 100K: ${c.scores_raw.homicide_rate} 
+                        General Danger (Higher is Worse): ${c.scores_raw.gpi} | Geopolitcal Situation Danger (Higher is Worse): ${c.scores_raw.gti} | Diplomacy Score (Higher is better): ${c.scores_raw.passport_vfs} | Homicides per 100K (Higher is worse): ${c.scores_raw.homicide_rate}  | Sexual Crime Risk (Higher is worse): ${c.scores_raw.rape_rate} 
                         ${femicideText}
                         ${isolationText}
                     </div>
