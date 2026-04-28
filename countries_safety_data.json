@@ -74,7 +74,7 @@
   {"country": "Honduras", "iso_code": "HN", "scores_raw": {"gpi": 2.347, "gti": 0.0, "passport_vfs": 134, "homicide_rate": 31.44, "femicide_rate": 7.663, "rape_rate": 16.9}},
   {"country": "Hungary", "iso_code": "HU", "scores_raw": {"gpi": 1.5, "gti": 0.0, "passport_vfs": 184, "homicide_rate": 0.72, "femicide_rate": 0.615, "rape_rate": 5.5}},
   {"country": "Iceland", "iso_code": "IS", "scores_raw": {"gpi": 1.095, "gti": 0.059, "passport_vfs": 185, "homicide_rate": 1.29, "femicide_rate": 0.529, "rape_rate": 0.4}},
-  {"country": "India", "iso_code": "IN", "scores_raw": {"gpi": 2.229, "gti": 6.428, "passport_vfs": 57, "homicide_rate": 2.82, "femicide_rate": 1.2, "rape_rate": 82.2}},
+  {"country": "India", "iso_code": "IN", "scores_raw": {"gpi": 2.229, "gti": 6.428, "passport_vfs": 57, "homicide_rate": 2.82, "femicide_rate": 1.4, "rape_rate": 92.2}},
   {"country": "Indonesia", "iso_code": "ID", "scores_raw": {"gpi": 1.786, "gti": 4.714, "passport_vfs": 73, "homicide_rate": 0.3, "femicide_rate": null, "rape_rate": 0.5}},
   {"country": "Iran", "iso_code": "IR", "scores_raw": {"gpi": 2.75, "gti": 25.477, "passport_vfs": 43, "homicide_rate": 2.38, "femicide_rate": null, "rape_rate": 35}},
   {"country": "Iraq", "iso_code": "IQ", "scores_raw": {"gpi": 2.862, "gti": 5.822, "passport_vfs": 30, "homicide_rate": 9.46, "femicide_rate": null, "rape_rate": 2.5}},
