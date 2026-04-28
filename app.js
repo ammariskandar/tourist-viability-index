@@ -40,8 +40,8 @@ function calculateFinalScore(country, liveAqi) {
         finalFemicideWeight = 0.32;
     }
 
-    // Final Calculation
-    const totalScore = 
+    // Final Base Calculation
+    let totalScore = 
         (gpiScore * WEIGHTS.gpi) +
         (gtiScore * WEIGHTS.gti) +
         (diplomacyScore * WEIGHTS.diplomacy) +
@@ -49,9 +49,27 @@ function calculateFinalScore(country, liveAqi) {
         (homicideScore * finalHomicideWeight) +
         (femicideScore * finalFemicideWeight);
 
+    // --- NEW: Isolation / Diplomacy Penalty ---
+    let isolationPenaltyText = '';
+    
+    if (raw.passport_vfs < 45) {
+        totalScore -= 70;
+        isolationPenaltyText = '*Extreme Isolation Penalty applied (-70)';
+    } else if (raw.passport_vfs < 50) {
+        totalScore -= 45;
+        isolationPenaltyText = '*High Isolation Penalty applied (-45)';
+    } else if (raw.passport_vfs < 58) {
+        totalScore -= 15;
+        isolationPenaltyText = '*Moderate Isolation Penalty applied (-15)';
+    }
+
+    // Ensure the score doesn't drop below 0 to keep the UI clean
+    totalScore = Math.max(0, totalScore);
+
     return {
         score: totalScore.toFixed(2),
-        penaltyApplied: penaltyApplied
+        penaltyApplied: penaltyApplied, // The femicide flag
+        isolationPenaltyText: isolationPenaltyText // The new diplomacy flag
     };
 }
 
@@ -81,10 +99,11 @@ function renderList(rankedCountries) {
     let html = '';
     
     rankedCountries.forEach((c, index) => {
-        // Penalty flag logic
-        const penaltyText = c.penaltyApplied ? `<br><span class="penalty-flag">*Femicide data missing, homicide penalty applied</span>` : '';
+        // Penalty flags
+        const femicideText = c.penaltyApplied ? `<br><span class="penalty-flag">*Femicide data missing, homicide penalty applied</span>` : '';
+        const isolationText = c.isolationPenaltyText ? `<br><span class="penalty-flag">${c.isolationPenaltyText}</span>` : '';
         
-        // --- NEW: Status Indicator Logic ---
+        // Status Indicator Logic
         let statusText = '';
         let statusClass = '';
         
@@ -101,15 +120,15 @@ function renderList(rankedCountries) {
             statusText = '(High Risk)';
             statusClass = 'status-danger';
         }
-        // -----------------------------------
-
+        
         html += `
             <div class="country-card">
                 <div>
                     <h2>#${index + 1} ${c.country} <span class="${statusClass}" style="font-size: 1rem; margin-left: 10px;">${statusText}</span></h2>
                     <div class="details">
-                        GPI: ${c.scores_raw.gpi} | GTI: ${c.scores_raw.gti} | Diplomacy Score: ${c.scores_raw.passport_vfs} | Homicides per 100K: ${c.scores_raw.homicide_rate}
-                        ${penaltyText}
+                        GPI: ${c.scores_raw.gpi} | GTI: ${c.scores_raw.gti} | Visa-Free: ${c.scores_raw.passport_vfs}
+                        ${femicideText}
+                        ${isolationText}
                     </div>
                 </div>
                 <div class="score">${c.final_score}</div>
