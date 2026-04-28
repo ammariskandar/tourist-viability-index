@@ -118,12 +118,17 @@ function renderList(rankedCountries) {
             statusText = '(DO NOT VISIT)';
             statusClass = 'status-danger';
         }
+
+        // --- NEW: Palestine specific addition ---
+        if (c.country === 'Palestine') {
+            statusText += ' #FreePalestine';
+        }
         
-        // Removed the inline onclick from the card-header
+        // Notice the inline style has been replaced by the "status-indicator" class
         html += `
             <div class="country-card">
                 <div class="card-header">
-                    <h2 style="margin: 0;">#${index + 1} ${c.country} <span class="${statusClass}" style="font-size: 1rem; margin-left: 10px;">${statusText}</span></h2>
+                    <h2 style="margin: 0;">#${index + 1} ${c.country} <span class="status-indicator ${statusClass}">${statusText}</span></h2>
                     <div class="score">${c.final_score}</div>
                 </div>
                 <div class="details">
@@ -138,19 +143,16 @@ function renderList(rankedCountries) {
     container.innerHTML = html;
 
     // --- ACCORDION EVENT LISTENERS ---
-    // Attach click events natively after the HTML is injected
     const headers = document.querySelectorAll('.card-header');
     headers.forEach(header => {
         header.addEventListener('click', function() {
-            // Find the details div immediately following the clicked header
             const detailsDiv = this.nextElementSibling;
-            // Toggle the visibility class
             detailsDiv.classList.toggle('show');
         });
     });
 }
 
-// --- 6. INITIALIZATION ---
+// --- 5. INITIALIZATION ---
 async function init() {
     try {
         const staticData = await fetchStaticData();

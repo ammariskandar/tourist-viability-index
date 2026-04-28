@@ -73,12 +73,33 @@
         .status-okay { color: #f39c12; font-weight: bold; }
         .status-avoid { color: #e74c3c; font-weight: bold; }
         .status-danger { color: #900c3f; font-weight: bold; }
+
+        /* --- Desktop Status Indicator --- */
+        .status-indicator {
+            font-size: 1rem;
+            margin-left: 10px;
+            display: inline; /* Keeps it on the same line */
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            .status-indicator {
+                display: block; /* Forces the text to drop below the country name */
+                font-size: 0.5rem; /* Exactly half of the desktop size */
+                margin-left: 0; /* Removes the side gap */
+                margin-top: 5px; /* Adds a tiny gap below the country name */
+            }
+            .card-header h2 {
+                line-height: 1.2; /* Prevents the text from overlapping on mobile */
+            }
+        }
+        
     </style>
 </head>
 <body>
     <div class="max-width">
         <h1>Recommended Countries to Travel</h1>
-        <p class="subtitle">Ranked by physical safety (general and geopolitical), homicide rate, sexual crime risk and diplomatic accessibility (how easy to enter without a Visa or how easy it is to get one). Note that Russia, Ukraine, Israel, Palestine, Iran and Lebanon have +20 GTI due to war.</p>
+        <p class="subtitle">Ranked by physical safety (general and geopolitical), homicide rate, sexual crime risk and diplomatic accessibility (how easy to enter without a Visa or how easy it is to get one).</p>
         <p class="subtitle" style="margin-bottom: 2rem;">The metrics used are GPI, GTI, Homicide Rate, Sexual Crime Rate, and Henley Passport Index.</p>
         
         <div id="loading">Loading data...</div>
