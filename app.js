@@ -1,7 +1,7 @@
 // --- 1. CONFIGURATION & WEIGHTS ---
 const WEIGHTS = {
-    gpi: 0.25,
-    gti: 0.35,
+    gpi: 0.20,
+    gti: 0.40,
     diplomacy: 0.03,
     aqi: 0.02
     // Homicide & Femicide handled dynamically based on data availability
@@ -24,7 +24,7 @@ function calculateFinalScore(country, liveAqi) {
     // Femicide fallback logic
     if (raw.femicide_rate === null) {
         // Apply 1.05x penalty to homicide rate
-        const penalizedHom = raw.homicide_rate * 1.05;
+        const penalizedHom = raw.homicide_rate * 1.08;
         homicideScore = Math.max(0, ((50 - penalizedHom) / 50) * 100);
         femicideScore = 0; 
         
