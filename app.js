@@ -57,15 +57,9 @@ function calculateFinalScore(country, liveAqi) {
 
 // --- 3. DATA FETCHING ---
 async function fetchStaticData() {
-    // In production, this fetches your built JSON file
-    // const response = await fetch('./countries_safety_data.json');
-    // return await response.json();
-    
-    // Mock data for immediate testing
-    return [
-        { country: "Iceland", iso_code: "IS", scores_raw: { gpi: 1.095, gti: 0.0, passport_vfs: 185, homicide_rate: 1.5, femicide_rate: 0.5 } },
-        { country: "Targeted Nation", iso_code: "XX", scores_raw: { gpi: 2.500, gti: 5.1, passport_vfs: 60, homicide_rate: 15.0, femicide_rate: null } }
-    ];
+    // Fetch the actual JSON file
+    const response = await fetch('./countries_safety_data.json');
+    return await response.json();
 }
 
 async function fetchLiveAQI(isoCode) {
