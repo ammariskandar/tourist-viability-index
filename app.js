@@ -1,7 +1,7 @@
 // --- 1. CONFIGURATION & WEIGHTS ---
 const WEIGHTS = {
-    gpi: 0.20,
-    gti: 0.27,
+    gpi: 0.13,
+    gti: 0.22,
     diplomacy: 0.02,
     aqi: 0.01
     // Homicide & Femicide handled dynamically based on data availability
@@ -29,15 +29,15 @@ function calculateFinalScore(country, liveAqi) {
         femicideScore = 0; 
         
         // Reallocate weights
-        finalHomicideWeight = 0.50;
+        finalHomicideWeight = 0.62;
         finalFemicideWeight = 0;
         penaltyApplied = true;
     } else {
         homicideScore = Math.max(0, ((50 - raw.homicide_rate) / 50) * 100);
         femicideScore = Math.max(0, ((20 - raw.femicide_rate) / 20) * 100);
         
-        finalHomicideWeight = 0.18;
-        finalFemicideWeight = 0.32;
+        finalHomicideWeight = 0.25;
+        finalFemicideWeight = 0.37;
     }
 
     // Final Base Calculation
@@ -52,7 +52,7 @@ function calculateFinalScore(country, liveAqi) {
     // --- NEW: Isolation / Diplomacy Penalty ---
     let isolationPenaltyText = '';
     
-    if (raw.passport_vfs < 36) {
+    if (raw.passport_vfs < 34) {
         totalScore -= 50;
         isolationPenaltyText = '*Extreme Inaccessibility Penalty applied (-50)';
     } else if (raw.passport_vfs < 50) {
@@ -126,7 +126,7 @@ function renderList(rankedCountries) {
                 <div>
                     <h2>#${index + 1} ${c.country} <span class="${statusClass}" style="font-size: 1rem; margin-left: 10px;">${statusText}</span></h2>
                     <div class="details">
-                        GPI: ${c.scores_raw.gpi} | GTI: ${c.scores_raw.gti} | Visa-Free: ${c.scores_raw.passport_vfs}
+                        GPI: ${c.scores_raw.gpi} | GTI: ${c.scores_raw.gti} | Diplomacy Score: ${c.scores_raw.passport_vfs} | Homicides per 100K: ${c.scores_raw.homicide_rate}
                         ${femicideText}
                         ${isolationText}
                     </div>
