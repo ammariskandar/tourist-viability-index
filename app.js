@@ -47,7 +47,7 @@ function calculateFinalScore(country, liveAqi) {
         (diplomacyScore * WEIGHTS.diplomacy) +
         (aqiScore * WEIGHTS.aqi) +
         (homicideScore * finalHomicideWeight) +
-        (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35);
+        (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35 *2.5);
 
     // --- NEW: Isolation / Diplomacy Penalty ---
     let isolationPenaltyText = '';
