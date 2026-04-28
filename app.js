@@ -52,9 +52,9 @@ function calculateFinalScore(country, liveAqi) {
     // --- NEW: Isolation / Diplomacy Penalty ---
     let isolationPenaltyText = '';
     
-    if (raw.passport_vfs < 45) {
-        totalScore -= 70;
-        isolationPenaltyText = '*Extreme Inaccessibility Penalty applied (-70)';
+    if (raw.passport_vfs < 40) {
+        totalScore -= 50;
+        isolationPenaltyText = '*Extreme Inaccessibility Penalty applied (-50)';
     } else if (raw.passport_vfs < 50) {
         totalScore -= 45;
         isolationPenaltyText = '*High Inaccesibility Penalty applied (-45)';
