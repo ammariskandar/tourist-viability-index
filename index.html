@@ -83,6 +83,22 @@
 
         /* --- Mobile Responsiveness --- */
         @media (max-width: 700px) {
+            /* 1. Hide the subheadings entirely */
+            p.subtitle {
+                display: none; 
+            }
+
+            /* 2. Reduce the massive space at the top and sides of the screen */
+            body {
+                padding: 1rem 0.5rem; /* 1rem top/bottom, 0.5rem sides */
+            }
+
+            /* 3. Reduce the padding inside the cards so they stretch closer to the edge */
+            .country-card {
+                padding: 1rem; 
+            }
+
+            /* (Your existing mobile rules below) */
             .status-indicator {
                 display: block; 
                 font-size: 0.6rem; 
@@ -92,13 +108,12 @@
             .card-header h2 {
                 line-height: 1.2; 
             }
-            /* --- New Size Rules --- */
             .country-name {
-                font-size: 70%; /* 30% smaller */
+                font-size: 60%; 
             }
             .rank-number {
-                font-size: 55%; /* 45% smaller */
-                margin-right: 2px; /* Keeps the spacing tight */
+                font-size: 58%; 
+                margin-right: 2px; 
             }
         }
 
