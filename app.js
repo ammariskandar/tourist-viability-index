@@ -4,7 +4,6 @@ const WEIGHTS = {
     gti: 0.22,
     diplomacy: 0.02,
     aqi: 0.01
-    // Homicide & Femicide handled dynamically based on data availability
 };
 
 // --- 2. THE MATH ENGINE ---
@@ -91,7 +90,14 @@ async function fetchLiveAQI(isoCode) {
     return mockAqi;
 }
 
-// --- 4. RENDER TO DOM ---
+// --- 4. ACCORDION TOGGLE ---
+function toggleDetails(element) {
+    // Finds the next sibling element (the details div) and toggles the 'show' class
+    const detailsDiv = element.nextElementSibling;
+    detailsDiv.classList.toggle('show');
+}
+
+// --- 5. RENDER TO DOM ---
 function renderList(rankedCountries) {
     const container = document.getElementById('results-container');
     document.getElementById('loading').style.display = 'none';
@@ -139,7 +145,7 @@ function renderList(rankedCountries) {
     container.innerHTML = html;
 }
 
-// --- 5. INITIALIZATION ---
+// --- 6. INITIALIZATION ---
 async function init() {
     try {
         const staticData = await fetchStaticData();

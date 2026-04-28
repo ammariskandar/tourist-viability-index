@@ -6,11 +6,68 @@
     <title>Tourist Viability Index</title>
     <style>
         /* Minimalist aesthetics */
-        body { font-family: system-ui, -apple-system, sans-serif; background: #f9f9f9; color: #111; margin: 0; padding: 2rem; }
-        max-width { max-width: 800px; margin: 0 auto; }
-        .country-card { background: white; padding: 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            background: #f9f9f9; 
+            color: #111; 
+            margin: 0; 
+            padding: 2rem; 
+        }
+        
+        /* Fixed missing dot selector here */
+        .max-width { 
+            max-width: 800px; 
+            margin: 0 auto; 
+        }
+
+        /* Subtitle styling */
+        p.subtitle { 
+            font-size: 0.9rem; 
+            color: #7f8c8d; 
+            font-style: italic; 
+            margin-top: -10px; 
+            margin-bottom: 1rem; 
+        }
+
+        /* Accordion Structure */
+        .country-card { 
+            background: white; 
+            padding: 1.5rem; 
+            border-bottom: 1px solid #eee; 
+            display: flex; 
+            flex-direction: column; /* Stack header and details vertically */
+        }
+        
+        .card-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            width: 100%; 
+            cursor: pointer; /* Show it is clickable */
+            user-select: none;
+        }
+        
+        .card-header:hover h2 {
+            color: #3498db; /* Slight interaction feedback */
+        }
+
+        /* Hidden details by default */
+        .details { 
+            font-size: 0.85rem; 
+            color: #666; 
+            margin-top: 1rem; 
+            padding-top: 1rem; 
+            border-top: 1px dashed #ddd; 
+            display: none; 
+        }
+        
+        /* Toggled by JS */
+        .details.show { 
+            display: block; 
+        }
+
+        /* Status colors */
         .score { font-size: 1.5rem; font-weight: bold; color: #2c3e50; }
-        .details { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
         .penalty-flag { color: #e74c3c; font-weight: bold; }
         .status-highly-recommended { color: #27ae60; font-weight: bold; }
         .status-okay { color: #f39c12; font-weight: bold; }
@@ -21,8 +78,9 @@
 <body>
     <div class="max-width">
         <h1>Recommended Countries to Travel</h1>
-        <p>Ranked by physical safety (general and geopolitical), homicide rate, sexual crime risk and diplomatic accessibility (how easy to enter without a Visa or how easy it is to get one). Note that Russia, Ukraine, Israel, Palestine, Iran and Lebanon have +20 GTI due to war.</p>
-        <p>The metrics used are GPI, GTI, Homicide Rate, Sexual Crime Rate, and Henley Passport Index.</p>
+        <p class="subtitle">Ranked by physical safety (general and geopolitical), homicide rate, sexual crime risk and diplomatic accessibility (how easy to enter without a Visa or how easy it is to get one). Note that Russia, Ukraine, Israel, Palestine, Iran and Lebanon have +20 GTI due to war.</p>
+        <p class="subtitle" style="margin-bottom: 2rem;">The metrics used are GPI, GTI, Homicide Rate, Sexual Crime Rate, and Henley Passport Index.</p>
+        
         <div id="loading">Loading data...</div>
         <div id="results-container"></div>
     </div>
