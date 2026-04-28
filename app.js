@@ -1,8 +1,8 @@
 // --- 1. CONFIGURATION & WEIGHTS ---
 const WEIGHTS = {
     gpi: 0.25,
-    gti: 0.25,
-    diplomacy: 0.20,
+    gti: 0.35,
+    diplomacy: 0.10,
     aqi: 0.05
     // Homicide & Femicide handled dynamically based on data availability
 };
