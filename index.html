@@ -84,13 +84,21 @@
         /* --- Mobile Responsiveness --- */
         @media (max-width: 700px) {
             .status-indicator {
-                display: block; /* Forces the text to drop below the country name */
-                font-size: 0.6rem; /* Almost half of the desktop size */
-                margin-left: 0; /* Removes the side gap */
-                margin-top: 5px; /* Adds a tiny gap below the country name */
+                display: block; 
+                font-size: 0.6rem; 
+                margin-left: 0; 
+                margin-top: 5px; 
             }
             .card-header h2 {
-                line-height: 1.2; /* Prevents the text from overlapping on mobile */
+                line-height: 1.2; 
+            }
+            /* --- New Size Rules --- */
+            .country-name {
+                font-size: 70%; /* 30% smaller */
+            }
+            .rank-number {
+                font-size: 55%; /* 45% smaller */
+                margin-right: 2px; /* Keeps the spacing tight */
             }
         }
 

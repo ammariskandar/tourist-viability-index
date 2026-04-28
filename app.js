@@ -128,7 +128,7 @@ function renderList(rankedCountries) {
         html += `
             <div class="country-card">
                 <div class="card-header">
-                    <h2 style="margin: 0;">#${index + 1} ${c.country} <span class="status-indicator ${statusClass}">${statusText}</span></h2>
+                    <h2 style="margin: 0;"><span class="rank-number">#${index + 1}</span> <span class="country-name">${c.country}</span> <span class="status-indicator ${statusClass}">${statusText}</span></h2>
                     <div class="score">${c.final_score}</div>
                 </div>
                 <div class="details">
