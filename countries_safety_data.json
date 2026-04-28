@@ -132,7 +132,7 @@
   {"country": "Norway", "iso_code": "NO", "scores_raw": {"gpi": 1.644, "gti": 0.725, "passport_vfs": 188, "homicide_rate": 0.72, "femicide_rate": 0.657, "rape_rate": 22.1}},
   {"country": "Oman", "iso_code": "OM", "scores_raw": {"gpi": 1.738, "gti": 2.282, "passport_vfs": 83, "homicide_rate": 0.14, "femicide_rate": 0.104, "rape_rate": 0.0}},
   {"country": "Pakistan", "iso_code": "PK", "scores_raw": {"gpi": 2.797, "gti": 8.574, "passport_vfs": 34, "homicide_rate": 4.33, "femicide_rate": 1.5, "rape_rate": 50.4}},
-  {"country": "Palestine", "iso_code": "PS", "scores_raw": {"gpi": 2.811, "gti": 24.8, "passport_vfs": 40, "homicide_rate": 0.62, "femicide_rate": null, "rape_rate": 0.17}},
+  {"country": "Palestine  #FreePalestine", "iso_code": "PS", "scores_raw": {"gpi": 2.811, "gti": 24.8, "passport_vfs": 40, "homicide_rate": 0.62, "femicide_rate": null, "rape_rate": 0.17}},
   {"country": "Palau", "iso_code": "PW", "scores_raw": {"gpi": 1.8, "gti": 0.0, "passport_vfs": 119, "homicide_rate": 11.23, "femicide_rate": null, "rape_rate": 35}},
   {"country": "Panama", "iso_code": "PA", "scores_raw": {"gpi": 2.006, "gti": 0.0, "passport_vfs": 143, "homicide_rate": 11.71, "femicide_rate": 1.705, "rape_rate": 76.3}},
   {"country": "Papua New Guinea", "iso_code": "PG", "scores_raw": {"gpi": 2.23, "gti": 0.0, "passport_vfs": 83, "homicide_rate": 9.34, "femicide_rate": null, "rape_rate": 35}},
