@@ -69,10 +69,14 @@ async function fetchStaticData() {
 }
 
 async function fetchLiveAQI(isoCode) {
-    // Replace with actual API call (e.g., WAQI or OpenAQ)
-    // For now, returning a mock AQI value based on the ISO code
-    const mockAqiData = { "IS": 15, "XX": 85 };
-    return mockAqiData[isoCode] || 50; 
+    // Deterministic mock generator: creates a stable AQI (15-95) based on the ISO string
+    let hash = 0;
+    for (let i = 0; i < isoCode.length; i++) {
+        hash = isoCode.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    // Convert the hash to an absolute number between 15 and 95
+    const mockAqi = Math.abs(hash % 80) + 15;
+    return mockAqi;
 }
 
 // --- 4. RENDER TO DOM ---
