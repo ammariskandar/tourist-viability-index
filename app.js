@@ -14,7 +14,7 @@ function calculateFinalScore(country, liveAqi) {
     // Normalizations
     const gpiScore = ((5 - raw.gpi) / 4) * 100;
     const gtiScore = ((10 - raw.gti) / 10) * 100;
-    const diplomacyScore = (raw.passport / 195) * 100;
+    const diplomacyScore = (raw.passport_vfs / 195) * 100;
     const aqiScore = Math.max(0, ((500 - liveAqi) / 500) * 100);
 
     let homicideScore, femicideScore;
@@ -33,8 +33,8 @@ function calculateFinalScore(country, liveAqi) {
         finalFemicideWeight = 0;
         penaltyApplied = true;
     } else {
-        homicideScore = Math.max(0, ((50 - raw.homicide) / 50) * 100);
-        femicideScore = Math.max(0, ((20 - raw.femicide) / 20) * 100);
+        homicideScore = Math.max(0, ((50 - raw.homicide_rate) / 50) * 100);
+        femicideScore = Math.max(0, ((20 - raw.femicide_rate) / 20) * 100);
         
         finalHomicideWeight = 0.25;
         finalFemicideWeight = 0.37;
@@ -47,18 +47,18 @@ function calculateFinalScore(country, liveAqi) {
         (diplomacyScore * WEIGHTS.diplomacy) +
         (aqiScore * WEIGHTS.aqi) +
         (homicideScore * finalHomicideWeight) +
-        (femicideScore * finalFemicideWeight) - ((raw.rape)/35 * 10);
+        (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35 * 10);
 
     // --- NEW: Isolation / Diplomacy Penalty ---
     let isolationPenaltyText = '';
     
-    if (raw.passport < 34) {
+    if (raw.passport_vfs < 34) {
         totalScore -= 50;
         isolationPenaltyText = '*Extreme inaccessibility penalty applied (-50)';
-    } else if (raw.passport < 50) {
+    } else if (raw.passport_vfs < 50) {
         totalScore -= 15;
         isolationPenaltyText = '*High inaccesibility Penalty applied (-15)';
-    } else if (raw.passport < 58) {
+    } else if (raw.passport_vfs < 58) {
         totalScore -= 5;
         isolationPenaltyText = '*Moderate inaccesibility penalty applied (-5)';
     }
