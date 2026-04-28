@@ -113,7 +113,7 @@ function renderList(rankedCountries) {
         } else if (c.final_score >= 70) {
             statusText = '(Okay to Visit)';
             statusClass = 'status-okay';
-        } else if (c.final_score >= 53) {
+        } else if (c.final_score >= 50) {
             statusText = '(Avoid Visiting)';
             statusClass = 'status-avoid';
         } else {
