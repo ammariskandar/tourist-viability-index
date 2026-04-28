@@ -82,6 +82,42 @@
         }
 
         /* --- Mobile Responsiveness --- */
+        @media (max-width: 600px) {
+            /* 1. Hide the subheadings entirely */
+            p.subtitle {
+                display: none; 
+            }
+
+            /* 2. Reduce the massive space at the top and sides of the screen */
+            body {
+                padding: 1rem 0.5rem; /* 1rem top/bottom, 0.5rem sides */
+            }
+
+            /* 3. Reduce the padding inside the cards so they stretch closer to the edge */
+            .country-card {
+                padding: 1rem; 
+            }
+
+            /* (Your existing mobile rules below) */
+            .status-indicator {
+                display: block; 
+                font-size: 0.6rem; 
+                margin-left: 0; 
+                margin-top: 5px; 
+            }
+            .card-header h2 {
+                line-height: 1.2; 
+            }
+            .country-name {
+                font-size: 75%; 
+            }
+            .rank-number {
+                font-size: 60%; 
+                margin-right: 2px; 
+            }
+        }
+
+        /* --- Mobile Responsiveness --- */
         @media (max-width: 700px) {
             /* 1. Hide the subheadings entirely */
             p.subtitle {
@@ -126,6 +162,7 @@
         <p class="subtitle" style="margin-bottom: 2rem;">The metrics used are GPI, GTI, Homicide Rate, Sexual Crime Rate, and Henley Passport Index.</p>
         
         <div id="loading">Loading data...</div>
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search for a country..." style="display: none;">
         <div id="results-container"></div>
     </div>
 

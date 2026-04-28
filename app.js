@@ -1,3 +1,5 @@
+let allCountriesData = []; // Holds the master dataset for searching
+
 // --- 1. CONFIGURATION & WEIGHTS ---
 const WEIGHTS = {
     gpi: 0.13,
@@ -128,7 +130,7 @@ function renderList(rankedCountries) {
         html += `
             <div class="country-card">
                 <div class="card-header">
-                    <h2 style="margin: 0;"><span class="rank-number">#${index + 1}</span> <span class="country-name">${c.country}</span> <span class="status-indicator ${statusClass}">${statusText}</span></h2>
+                    <h2 style="margin: 0;"><span class="rank-number">#${c.original_rank}</span> <span class="country-name">${c.country}</span> <span class="status-indicator ${statusClass}">${statusText}</span></h2>
                     <div class="score">${c.final_score}</div>
                 </div>
                 <div class="details">
@@ -167,14 +169,37 @@ async function init() {
                 ...country,
                 final_score: parseFloat(calc.score),
                 penaltyApplied: calc.penaltyApplied,
-                isolationPenaltyText: calc.isolationPenaltyText // <-- FIXED: Added missing variable pass-through
+                isolationPenaltyText: calc.isolationPenaltyText
             });
         }
 
         // Sort Highest to Lowest
         processedData.sort((a, b) => b.final_score - a.final_score);
 
-        renderList(processedData);
+        // Stamp the true rank so it doesn't change when filtering
+        processedData.forEach((c, i) => {
+            c.original_rank = i + 1;
+        });
+
+        // Save to global master list
+        allCountriesData = processedData;
+
+        // Render the initial full list
+        renderList(allCountriesData);
+
+        // Reveal the search bar and attach the listener
+        const searchInput = document.getElementById('searchInput');
+        searchInput.style.display = 'block';
+        
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            // Filter the master list
+            const filteredData = allCountriesData.filter(c => 
+                c.country.toLowerCase().includes(searchTerm)
+            );
+            // Re-render with the filtered results
+            renderList(filteredData);
+        });
 
     } catch (error) {
         console.error("Failed to load data:", error);
