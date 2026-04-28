@@ -985,7 +985,7 @@
     "scores_raw": {
       "gpi": 2.911,
       "gti": 0.0,
-      "passport_vfs": 40,
+      "passport_vfs": 0,
       "homicide_rate": 4.4,
       "femicide_rate": null
     }
