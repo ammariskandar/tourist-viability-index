@@ -1,9 +1,9 @@
 // --- 1. CONFIGURATION & WEIGHTS ---
 const WEIGHTS = {
-    gpi: 0.30,
+    gpi: 0.25,
     gti: 0.35,
-    diplomacy: 0.05,
-    aqi: 0.05
+    diplomacy: 0.03,
+    aqi: 0.02
     // Homicide & Femicide handled dynamically based on data availability
 };
 
@@ -29,15 +29,15 @@ function calculateFinalScore(country, liveAqi) {
         femicideScore = 0; 
         
         // Reallocate weights
-        finalHomicideWeight = 0.25;
+        finalHomicideWeight = 0.35;
         finalFemicideWeight = 0;
         penaltyApplied = true;
     } else {
         homicideScore = Math.max(0, ((50 - raw.homicide_rate) / 50) * 100);
         femicideScore = Math.max(0, ((20 - raw.femicide_rate) / 20) * 100);
         
-        finalHomicideWeight = 0.10;
-        finalFemicideWeight = 0.15;
+        finalHomicideWeight = 0.15;
+        finalFemicideWeight = 0.2;
     }
 
     // Final Calculation
