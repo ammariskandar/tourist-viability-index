@@ -24,7 +24,7 @@ function calculateFinalScore(country, liveAqi) {
     // Femicide fallback logic
     if (raw.femicide_rate === null) {
         // Apply 1.2x penalty to homicide rate
-        const penalizedHom = raw.homicide_rate * 1.2;
+        const penalizedHom = raw.homicide_rate * 2;
         homicideScore = Math.max(0, ((50 - penalizedHom) / 50) * 100);
         femicideScore = 0; 
         
@@ -54,13 +54,13 @@ function calculateFinalScore(country, liveAqi) {
     
     if (raw.passport_vfs < 34) {
         totalScore -= 50;
-        isolationPenaltyText = '*Extreme Inaccessibility Penalty applied (-50)';
+        isolationPenaltyText = '*Extreme inaccessibility penalty applied (-50)';
     } else if (raw.passport_vfs < 50) {
         totalScore -= 15;
-        isolationPenaltyText = '*High Inaccesibility Penalty applied (-15)';
+        isolationPenaltyText = '*High inaccesibility Penalty applied (-15)';
     } else if (raw.passport_vfs < 58) {
         totalScore -= 5;
-        isolationPenaltyText = '*Moderate Inaccesibility Penalty applied (-5)';
+        isolationPenaltyText = '*Moderate inaccesibility penalty applied (-5)';
     }
 
     // Ensure the score doesn't drop below 0 to keep the UI clean
@@ -100,7 +100,7 @@ function renderList(rankedCountries) {
     
     rankedCountries.forEach((c, index) => {
         // Penalty flags
-        const femicideText = c.penaltyApplied ? `<br><span class="penalty-flag">*Femicide data missing, homicide penalty applied</span>` : '';
+        const femicideText = c.penaltyApplied ? `<br><span class="penalty-flag">*Femicide data missing, homicide penalty applied (2x)</span>` : '';
         const isolationText = c.isolationPenaltyText ? `<br><span class="penalty-flag">${c.isolationPenaltyText}</span>` : '';
         
         // Status Indicator Logic
@@ -113,7 +113,7 @@ function renderList(rankedCountries) {
         } else if (c.final_score >= 70) {
             statusText = '(Okay to Visit)';
             statusClass = 'status-okay';
-        } else if (c.final_score >= 50) {
+        } else if (c.final_score >= 53) {
             statusText = '(Avoid Visiting)';
             statusClass = 'status-avoid';
         } else {
