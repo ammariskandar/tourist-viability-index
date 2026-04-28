@@ -852,7 +852,7 @@
     "iso_code": "IR",
     "scores_raw": {
       "gpi": 2.75,
-      "gti": 15.477,
+      "gti": 25.477,
       "passport_vfs": 43,
       "homicide_rate": 2.38,
       "femicide_rate": null
@@ -885,7 +885,7 @@
     "iso_code": "IL",
     "scores_raw": {
       "gpi": 3.108,
-      "gti": 16.79,
+      "gti": 26.79,
       "passport_vfs": 166,
       "homicide_rate": 1.63,
       "femicide_rate": 0.5
@@ -1061,7 +1061,7 @@
     "iso_code": "LB",
     "scores_raw": {
       "gpi": 2.674,
-      "gti": 10.648,
+      "gti": 20.648,
       "passport_vfs": 42,
       "homicide_rate": 2.24,
       "femicide_rate": null
@@ -1468,7 +1468,7 @@
     "iso_code": "PS",
     "scores_raw": {
       "gpi": 2.811,
-      "gti": 14.8,
+      "gti": 24.8,
       "passport_vfs": 40,
       "homicide_rate": 0.62,
       "femicide_rate": null
