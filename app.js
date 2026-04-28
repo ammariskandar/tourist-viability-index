@@ -23,7 +23,7 @@ function calculateFinalScore(country, liveAqi) {
 
     // Femicide fallback logic
     if (raw.femicide_rate === null) {
-        // Apply 1.05x penalty to homicide rate
+        // Apply 1.2x penalty to homicide rate
         const penalizedHom = raw.homicide_rate * 1.2;
         homicideScore = Math.max(0, ((50 - penalizedHom) / 50) * 100);
         femicideScore = 0; 
@@ -153,7 +153,8 @@ async function init() {
             processedData.push({
                 ...country,
                 final_score: parseFloat(calc.score),
-                penaltyApplied: calc.penaltyApplied
+                penaltyApplied: calc.penaltyApplied,
+                isolationPenaltyText: calc.isolationPenaltyText // <-- FIXED: Added missing variable pass-through
             });
         }
 
