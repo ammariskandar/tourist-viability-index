@@ -53,11 +53,11 @@ function calculateFinalScore(country, liveAqi) {
     let isolationPenaltyText = '';
     
     if (raw.passport_vfs < 33) {
-        totalScore -= 50;
-        isolationPenaltyText = '*Extreme inaccessibility penalty applied (-50)';
+        totalScore -= 60;
+        isolationPenaltyText = '*Extreme inaccessibility penalty applied (-60)';
     } else if (raw.passport_vfs < 50) {
-        totalScore -= 15;
-        isolationPenaltyText = '*High inaccesibility penalty applied (-15)';
+        totalScore -= 10;
+        isolationPenaltyText = '*High inaccesibility penalty applied (-10)';
     } else if (raw.passport_vfs < 55) {
         totalScore -= 5;
         isolationPenaltyText = '*Moderate inaccesibility penalty applied (-5)';
