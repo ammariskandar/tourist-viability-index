@@ -1585,11 +1585,11 @@
     }
   },
   {
-    "country": "Russian Federation",
+    "country": "Russia",
     "iso_code": "RU",
     "scores_raw": {
       "gpi": 3.441,
-      "gti": 5.593,
+      "gti": 25.593,
       "passport_vfs": 119,
       "homicide_rate": 6.77,
       "femicide_rate": 2.78
@@ -2029,7 +2029,7 @@
     "iso_code": "UA",
     "scores_raw": {
       "gpi": 3.434,
-      "gti": 2.927,
+      "gti": 22.927,
       "passport_vfs": 146,
       "homicide_rate": 3.78,
       "femicide_rate": null
