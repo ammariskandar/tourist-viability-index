@@ -2,8 +2,8 @@
 const WEIGHTS = {
     gpi: 0.20,
     gti: 0.37,
-    diplomacy: 0.03,
-    aqi: 0.02
+    diplomacy: 0.02,
+    aqi: 0.01
     // Homicide & Femicide handled dynamically based on data availability
 };
 
@@ -29,7 +29,7 @@ function calculateFinalScore(country, liveAqi) {
         femicideScore = 0; 
         
         // Reallocate weights
-        finalHomicideWeight = 0.38;
+        finalHomicideWeight = 0.40;
         finalFemicideWeight = 0;
         penaltyApplied = true;
     } else {
@@ -37,7 +37,7 @@ function calculateFinalScore(country, liveAqi) {
         femicideScore = Math.max(0, ((20 - raw.femicide_rate) / 20) * 100);
         
         finalHomicideWeight = 0.18;
-        finalFemicideWeight = 0.2;
+        finalFemicideWeight = 0.22;
     }
 
     // Final Calculation
