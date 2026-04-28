@@ -24,7 +24,7 @@ function calculateFinalScore(country, liveAqi) {
     // Femicide fallback logic
     if (raw.femicide_rate === null) {
         // Apply 1.2x penalty to homicide rate
-        const penalizedHom = raw.homicide_rate * 2;
+        const penalizedHom = raw.homicide_rate * 1.7;
         homicideScore = Math.max(0, ((50 - penalizedHom) / 50) * 100);
         femicideScore = 0; 
         
@@ -57,7 +57,7 @@ function calculateFinalScore(country, liveAqi) {
         isolationPenaltyText = '*Extreme inaccessibility penalty applied (-50)';
     } else if (raw.passport_vfs < 50) {
         totalScore -= 15;
-        isolationPenaltyText = '*High inaccesibility Penalty applied (-15)';
+        isolationPenaltyText = '*High inaccesibility penalty applied (-15)';
     } else if (raw.passport_vfs < 55) {
         totalScore -= 5;
         isolationPenaltyText = '*Moderate inaccesibility penalty applied (-5)';
@@ -100,7 +100,7 @@ function renderList(rankedCountries) {
     
     rankedCountries.forEach((c, index) => {
         // Penalty flags
-        const femicideText = c.penaltyApplied ? `<br><span class="penalty-flag">*Femicide data missing, homicide penalty applied (2x)</span>` : '';
+        const femicideText = c.penaltyApplied ? `<br><span class="penalty-flag">*Femicide data missing, homicide penalty applied (1.7x)</span>` : '';
         const isolationText = c.isolationPenaltyText ? `<br><span class="penalty-flag">${c.isolationPenaltyText}</span>` : '';
         
         // Status Indicator Logic
