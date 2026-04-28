@@ -81,15 +81,35 @@ function renderList(rankedCountries) {
     let html = '';
     
     rankedCountries.forEach((c, index) => {
-        const penaltyText = c.penaltyApplied ? `<span class="penalty-flag">*Femicide data missing, homicide penalty applied</span>` : '';
+        // Penalty flag logic
+        const penaltyText = c.penaltyApplied ? `<br><span class="penalty-flag">*Femicide data missing, homicide penalty applied</span>` : '';
         
+        // --- NEW: Status Indicator Logic ---
+        let statusText = '';
+        let statusClass = '';
+        
+        if (c.final_score >= 80) {
+            statusText = '(Highly Recommended)';
+            statusClass = 'status-highly-recommended';
+        } else if (c.final_score >= 70) {
+            statusText = '(Okay to Visit)';
+            statusClass = 'status-okay';
+        } else if (c.final_score >= 60) {
+            statusText = '(Avoid Visiting)';
+            statusClass = 'status-avoid';
+        } else {
+            statusText = '(High Risk)';
+            statusClass = 'status-danger';
+        }
+        // -----------------------------------
+
         html += `
             <div class="country-card">
                 <div>
-                    <h2>#${index + 1} ${c.country}</h2>
+                    <h2>#${index + 1} ${c.country} <span class="${statusClass}" style="font-size: 1rem; margin-left: 10px;">${statusText}</span></h2>
                     <div class="details">
                         GPI: ${c.scores_raw.gpi} | GTI: ${c.scores_raw.gti} | Visa-Free: ${c.scores_raw.passport_vfs}
-                        <br>${penaltyText}
+                        ${penaltyText}
                     </div>
                 </div>
                 <div class="score">${c.final_score}</div>
