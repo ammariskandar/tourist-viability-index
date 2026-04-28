@@ -126,7 +126,7 @@ function renderList(rankedCountries) {
                 <div>
                     <h2>#${index + 1} ${c.country} <span class="${statusClass}" style="font-size: 1rem; margin-left: 10px;">${statusText}</span></h2>
                     <div class="details">
-                        General Danger (Higher is Worse): ${c.scores_raw.gpi} | Geopolitcal Situation Danger (Higher is Worse): ${c.scores_raw.gti} | Diplomacy Score (Higher is better): ${c.scores_raw.passport_vfs} | Homicides per 100K (Higher is worse): ${c.scores_raw.homicide_rate}  | Sexual Crime Risk (Higher is worse): ${c.scores_raw.rape_rate} 
+                        General Risk (Higher is Worse): ${c.scores_raw.gpi} | Geopolitcal Situation Risk (Higher is Worse): ${c.scores_raw.gti} | Diplomacy Score (Higher is better): ${c.scores_raw.passport_vfs} | Homicides per 100K (Higher is worse): ${c.scores_raw.homicide_rate}  | Sexual Crime Risk (Higher is worse) (Global Average is 40): ${c.scores_raw.rape_rate} 
                         ${femicideText}
                         ${isolationText}
                     </div>
