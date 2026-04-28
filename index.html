@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Viability Index</title>
+    <style>
+        /* Minimalist aesthetics */
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f9f9f9; color: #111; margin: 0; padding: 2rem; }
+        max-width { max-width: 800px; margin: 0 auto; }
+        .country-card { background: white; padding: 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .score { font-size: 1.5rem; font-weight: bold; color: #2c3e50; }
+        .details { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        .penalty-flag { color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="max-width">
+        <h1>Safest Countries to Travel</h1>
+        <p>Ranked by physical safety, infrastructure, and diplomatic accessibility.</p>
+        <div id="loading">Loading data...</div>
+        <div id="results-container"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

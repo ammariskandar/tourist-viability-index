@@ -1,0 +1,27 @@
+[
+  {
+    "country": "Example Nation",
+    "iso_code": "EX",
+    "scores_raw": {
+      "gpi": 1.500,
+      "gti": 2.100,
+      "passport_vfs": 120,
+      "homicide_rate": 10.0,
+      "femicide_rate": null,
+      "aqi": 45
+    },
+    "data_flags": {
+      "femicide_missing": true,
+      "homicide_penalty_applied": 1.05
+    },
+    "scores_normalized": {
+      "gpi": 87.50,
+      "gti": 79.00,
+      "diplomacy": 61.53,
+      "homicide": 79.00, 
+      "femicide": null,
+      "environment": 91.00
+    },
+    "score_final": 78.43
+  }
+]
