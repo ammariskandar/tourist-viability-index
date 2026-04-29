@@ -39,6 +39,10 @@ const HOLY_SITE_ORTHODOX = ['RU', 'GR']; // Moscow & Mount Athos
 // --- Overtourism Penalty ---
 const OVERTOURISM_NATIONS = ['ES', 'IT', 'GR', 'NL', 'FR', 'JP', 'TH', 'VA', 'MA'];
 
+// --- Free Expression & Censorship Penalties ---
+const CENSORSHIP_ABSOLUTE = ['KP', 'TM']; // North Korea, Turkmenistan
+const CENSORSHIP_HIGH = ['ER', 'CN', 'IR', 'CU', 'BY']; // Eritrea, China, Iran, Cuba, Belarus
+
 // --- 2. THE MATH ENGINE ---
 function calculateFinalScore(country, liveAqi, advisoryData) {
     const raw = country.scores_raw;
@@ -214,6 +218,20 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         }
     }
 
+    // --- NEW: Censorship & Free Expression Penalty ---
+    let censorshipStatus = "No";
+    let censorshipColor = "";
+
+    if (CENSORSHIP_ABSOLUTE.includes(country.iso_code)) {
+        totalScore -= 30;
+        censorshipStatus = "Yes, absolute (-30)";
+        censorshipColor = "color: #c0392b; font-weight: bold;"; // Red and bold
+    } else if (CENSORSHIP_HIGH.includes(country.iso_code)) {
+        totalScore -= 15;
+        censorshipStatus = "Yes, high (-15)";
+        censorshipColor = "color: #e67e22;"; // Orange
+    }
+
     // Ensure the score doesn't drop below 0
     totalScore = Math.max(0, totalScore);
 
@@ -235,7 +253,9 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         muslimFriendlyColor: muslimFriendlyColor,
         holySiteStatus: holySiteStatus,
         overtourismStatus: overtourismStatus,
-        overtourismColor: overtourismColor    
+        overtourismColor: overtourismColor,
+        censorshipStatus: censorshipStatus,
+        censorshipColor: censorshipColor  
     };
 }
 
@@ -364,6 +384,10 @@ function renderList(rankedCountries) {
                             <span class="stat-label">Suffering from Overtourism?</span>
                             <span class="stat-value" style="${c.overtourismColor}">${c.overtourismStatus}</span>
                         </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Strict Laws & Censorship?</span>
+                            <span class="stat-value" style="${c.censorshipColor}">${c.censorshipStatus}</span>
+                        </div>
                     </div>
                     <!-- Penalties sit cleanly below the grid -->
                     <div style="margin-top: 10px;">
@@ -438,8 +462,10 @@ async function init() {
                 muslimFriendlyStatus: calc.muslimFriendlyStatus,
                 muslimFriendlyColor: calc.muslimFriendlyColor,
                 holySiteStatus: calc.holySiteStatus,
-                overtourismStatus: calc.overtourismStatus, 
-                overtourismColor: calc.overtourismColor
+                overtourismStatus: calc.overtourismStatus,
+                overtourismColor: calc.overtourismColor,
+                censorshipStatus: calc.censorshipStatus,
+                censorshipColor: calc.censorshipColor
             });
         }
 
