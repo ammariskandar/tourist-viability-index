@@ -178,12 +178,12 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
     // 2. Otherwise, check for the Penalty
     else if (!UNESCO_MIN_6.includes(country.iso_code)) {
         if (MICROSTATES.includes(country.iso_code)) {
-            totalScore -= 5;
-            unescoCombinedStatus = "Less than 6 Sites (Microstate, -5)";
-            unescoCombinedColor = "color: #7f8c8d;";
-        } else {
             totalScore -= 10;
-            unescoCombinedStatus = "Less than 6 Sites (-10)";
+            unescoCombinedStatus = "Less than 6 Sites (Microstate, -10)";
+            unescoCombinedColor = "color: #ef6f00;";
+        } else {
+            totalScore -= 15;
+            unescoCombinedStatus = "Less than 6 Sites (-15)";
             unescoCombinedColor = "color: #c0392b;";
         }
     }
