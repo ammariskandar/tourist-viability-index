@@ -63,10 +63,10 @@ Logic: Scored from 0-5. Points are awarded for affordability. High CLI (expensiv
 🧠 Bias Corrections & Algorithmic Adjustments
 Raw data is rarely neutral. To prevent the index from simply echoing institutional privilege, the engine runs a series of hardcoded algorithmic adjustments.
 
-1. The Eurocentric Reporting Adjustment (-5% Penalty)
+1. The Eurocentric Reporting Adjustment (-2% Penalty)
 Target: NATO Member States, Austria, Switzerland, Ireland.
 
-Logic: It is a well-documented statistical phenomenon that Western-headquartered institutions (which produce the GPI, Henley Index, etc.) naturally score nations with Western-style geopolitical structures higher, while penalizing alternative governance models. This 5% algorithmic reduction acts as a counterbalance to institutional "Reporting Bias."
+Logic: It is a well-documented statistical phenomenon that Western-headquartered institutions (which produce the GPI, Henley Index, etc.) naturally score nations with Western-style geopolitical structures higher, while penalizing alternative governance models. This 2% algorithmic reduction acts as a counterbalance to institutional "Reporting Bias."
 
 Further Reading:
 
@@ -74,7 +74,7 @@ The Bias of the Global Peace Index (Various sociological critiques regarding the
 
 Western-Centrism in Global Rankings by scholars like Dr. Juan Pablo Luna.
 
-2. The Microstate Statistical Anomaly Penalty (-2.77 Points)
+2. The Microstate Statistical Anomaly Penalty (-7.77 Points)
 Target: Nations under 1,000 sq km or populations under 100k (e.g., Vatican City, Monaco, San Marino).
 
 Logic: In statistics, tiny sample sizes create wild distortions. A microstate with 800 citizens naturally reports 0 homicides and 0 terror attacks, launching them to the absolute top of the index. This minor deduction prevents city-states from mathematically overwhelming complex, multi-million-population nations in the top 10.
