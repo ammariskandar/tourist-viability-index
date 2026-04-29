@@ -575,35 +575,52 @@ async function init() {
     }
 }
 function processAndRenderData() {
+    // 1. Check if the user has Solo Mode turned on
     const isSoloMode = document.getElementById('soloToggle').checked;
     const processedData = [];
 
+    // 2. Loop through the raw data and run the math engine for every country
     for (const item of rawCountriesData) {
         const calc = calculateFinalScore(item.country, item.liveAqi, item.countryAdvisory, isSoloMode);
         
+        // 3. Package all the math results and UI text into a clean object
         processedData.push({
             ...item.country,
             final_score: calc.score,
+            
+            // Base Penalties
             penaltyApplied: calc.penaltyApplied,
             isolationPenaltyText: calc.isolationPenaltyText,
             microstatePenaltyText: calc.microstatePenaltyText,
             eurocentricPenaltyText: calc.eurocentricPenaltyText,
+            
+            // Smartraveller API Data
             advisoryLevel: calc.advisoryLevel,
             advisoryWarning: calc.advisoryWarning,
             advisoryPageUrl: item.countryAdvisory ? item.countryAdvisory.pageUrl : null,
+            
+            // Economic Data
             displayGdp: calc.displayGdp,
             gdpScore: calc.gdpScore,
             displayCli: calc.displayCli,
             cliScore: calc.cliScore,
+            
+            // Culture & Nature Bonuses
             isUnescoTop10: calc.isUnescoTop10,
             isNatureTop3: calc.isNatureTop3,
+            
+            // Inclusivity & Religion
             muslimFriendlyStatus: calc.muslimFriendlyStatus,
             muslimFriendlyColor: calc.muslimFriendlyColor,
             holySiteStatus: calc.holySiteStatus,
+            
+            // Overtourism & Censorship
             overtourismStatus: calc.overtourismStatus,
             overtourismColor: calc.overtourismColor,
             censorshipStatus: calc.censorshipStatus,
             censorshipColor: calc.censorshipColor,
+            
+            // Connectivity & Culinary
             connectivityStatus: calc.connectivityStatus,
             connectivityColor: calc.connectivityColor,
             michelinStatus: calc.michelinStatus,
@@ -611,21 +628,27 @@ function processAndRenderData() {
         });
     }
 
-    // Sort Highest to Lowest
+    // 4. Sort the entire list from Highest Score to Lowest Score
     processedData.sort((a, b) => b.final_score - a.final_score);
 
-    // Stamp the true rank
+    // 5. Stamp the true rank onto each country (1st, 2nd, 3rd...)
     processedData.forEach((c, i) => {
         c.original_rank = i + 1;
     });
 
+    // 6. Save this fully processed list to the global variable so the search bar can use it
     allCountriesData = processedData;
 
-    // Respect search input during re-render
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    // 7. Check if the user is currently searching for a specific country
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
+    
     if (searchTerm) {
-        renderList(allCountriesData.filter(c => c.country.toLowerCase().includes(searchTerm)));
+        // If they are searching, only render the matches
+        const filteredData = allCountriesData.filter(c => c.country.toLowerCase().includes(searchTerm));
+        renderList(filteredData);
     } else {
+        // Otherwise, render the whole list
         renderList(allCountriesData);
     }
 }
