@@ -318,8 +318,7 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         displayGdp: displayGdp,
         gdpScore: gdpScore,
         displayCli: displayCli,
-        cliScore: cliScore,
-        isUnescoTop10: isUnescoTop10, 
+        cliScore: cliScore, 
         isNatureTop8: isNatureTop8,
         muslimFriendlyStatus: muslimFriendlyStatus,
         muslimFriendlyColor: muslimFriendlyColor,
@@ -520,7 +519,6 @@ function processAndRenderData() {
             displayCli: calc.displayCli,
             cliScore: calc.cliScore,
             
-            isUnescoTop10: calc.isUnescoTop10,
             isNatureTop8: calc.isNatureTop8,
             
             muslimFriendlyStatus: calc.muslimFriendlyStatus,
