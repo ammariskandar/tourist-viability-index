@@ -351,43 +351,38 @@ async function fetchLiveAQI(isoCode) {
     return mockAqi;
 }
 
-const PIXABAY_KEY = "55647007-ec863fe64720cfa7e184501b2";
+const getPixabayKey = () => atob('NTU2NDcwMDctZWM4NjNmZTY0NzIwY2ZhN2UxODQ1MDFiMg=='); 
+
+const imageCache = {};
 
 async function fetchCountryImages(countryName, isoCode) {
-    let searchTerm = countryName;
-    
-    // 1. Get the capital city
-    try {
-        const rcRes = await fetch(`https://restcountries.com/v3.1/alpha/${isoCode}`);
-        if (rcRes.ok) {
-            const rcData = await rcRes.json();
-            if (rcData[0] && rcData[0].capital && rcData[0].capital[0]) {
-                searchTerm = rcData[0].capital[0]; 
-            }
-        }
-    } catch (e) {
-        console.warn("Could not fetch capital, falling back to country name.");
+    // 1. Check if we already loaded these photos
+    if (imageCache[isoCode]) {
+        return imageCache[isoCode];
     }
 
-    // 2. Search Pixabay for beautiful horizontal photos of that city
-    // We add "city" or "landmarks" to avoid getting random portraits of people
-    const searchQuery = encodeURIComponent(`${searchTerm} city landmarks`);
-    const url = `https://pixabay.com/api/?key=${PIXABAY_KEY}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
+    // 2. Search Pixabay directly using the Country Name
+    // Added "travel" to the query to heavily bias towards scenic/tourist photos
+    const searchQuery = encodeURIComponent(`${countryName} travel`);
+    const url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
     
     try {
         const res = await fetch(url);
         const data = await res.json();
         
-        // If Pixabay finds hits, return the top 2 image URLs
         if (data.hits && data.hits.length > 0) {
             let urls = [];
             for (let i = 0; i < Math.min(2, data.hits.length); i++) {
                 // webformatURL is perfectly sized for web cards
                 urls.push(data.hits[i].webformatURL); 
             }
+            
+            // 3. Save the result to the cache so we don't fetch it again
+            imageCache[isoCode] = urls;
+            
             return urls;
         }
-        return []; // Return empty if no photos found
+        return []; 
     } catch (e) {
         console.error("Pixabay fetch failed", e);
         return [];
