@@ -569,7 +569,7 @@ async function init() {
         
         let advisories = {};
         try {
-            const advResponse = await fetch('https://www.smartraveller.gov.au/destinations-export');
+            const advResponse = await fetch('https://smartraveller.kevle.xyz/api/advisories');
             if (advResponse.ok) {
                 const advData = await advResponse.json();
                 if (advData && advData.advisories) {
