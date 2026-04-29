@@ -108,9 +108,9 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
     // --- NEW: Eurocentric Reporting Adjustment ---
     let eurocentricPenaltyText = '';
     if (EUROCENTRIC_NATIONS.includes(country.iso_code)) {
-        const deduction = totalScore * 0.05;
+        const deduction = totalScore * 0.02;
         totalScore -= deduction;
-        eurocentricPenaltyText = `*Eurocentric reporting adjustment applied (-5%)`;
+        eurocentricPenaltyText = `*Eurocentric reporting adjustment applied (-2%)`;
     }
 
     // Smartraveller API Penalty
@@ -312,6 +312,7 @@ async function init() {
                 penaltyApplied: calc.penaltyApplied,
                 isolationPenaltyText: calc.isolationPenaltyText,
                 microstatePenaltyText: calc.microstatePenaltyText,
+                eurocentricPenaltyText: calc.eurocentricPenaltyText,
                 advisoryLevel: calc.advisoryLevel,
                 advisoryWarning: calc.advisoryWarning,
                 advisoryPageUrl: countryAdvisory ? countryAdvisory.pageUrl : null,
