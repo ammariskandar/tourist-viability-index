@@ -49,6 +49,30 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         finalHomicideWeight = 0.25;
         finalFemicideWeight = 0.37;
     }
+    // --- NEW: Economic Metrics (With Fallbacks for Null Data) ---
+    
+    // Default to neutral 5/10 if data is missing so we don't unfairly penalize the total score
+    let gdpScore = 5.00; 
+    let displayGdp = "Data Missing";
+    
+    if (raw.gdp !== null && raw.gdp !== undefined) {
+        // Logarithmic scale: GDP spans from $60M (Tuvalu) to $27T (US)
+        const logGdp = Math.log10(raw.gdp);
+        gdpScore = ((logGdp - 7.5) / (13.5 - 7.5)) * 10;
+        gdpScore = Math.max(0, Math.min(10, gdpScore)); // Clamp strictly between 0 and 10
+        displayGdp = `$${(raw.gdp / 1000000000).toFixed(2)} Billion`; 
+    }
+
+    // Default to neutral 2.5/5 if data is missing
+    let cpiScore = 2.50; 
+    let displayCpi = "Data Missing";
+    
+    if (raw.cpi !== null && raw.cpi !== undefined) {
+        // Assuming a Cost of Living Index where ~120 is highly expensive and ~30 is dirt cheap
+        cpiScore = ((120 - raw.cpi) / (120 - 30)) * 5;
+        cpiScore = Math.max(0, Math.min(5, cpiScore)); // Clamp strictly between 0 and 5
+        displayCpi = raw.cpi;
+    }
 
     // Final Base Calculation
     let totalScore = 
@@ -57,7 +81,8 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         (diplomacyScore * WEIGHTS.diplomacy) +
         (aqiScore * WEIGHTS.aqi) +
         (homicideScore * finalHomicideWeight) +
-        (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35 * 2.5);
+        (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35 * 2.5) +
+        gdpScore + cpiScore;
 
     // Isolation / Diplomacy Penalty
     let isolationPenaltyText = '';
@@ -113,7 +138,11 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         microstatePenaltyText: microstatePenaltyText,
         eurocentricPenaltyText: eurocentricPenaltyText,
         advisoryLevel: advisoryLevel,
-        advisoryWarning: advisoryWarning
+        advisoryWarning: advisoryWarning,
+        displayGdp: displayGdp,
+        gdpScore: gdpScore,
+        displayCpi: displayCpi,
+        cpiScore: cpiScore
     };
 }
 
@@ -214,6 +243,14 @@ function renderList(rankedCountries) {
                             <span class="stat-label">Sexual Crime Risk (Higher is worse) (Global Average is 40)</span>
                             <span class="stat-value">${c.scores_raw.rape_rate}</span>
                         </div>
+                        <div class="stat-box">
+                            <span class="stat-label">GDP (Logarithmic 0-10)</span>
+                            <span class="stat-value">${c.displayGdp !== 'Data Missing' ? `${c.displayGdp} (+${c.gdpScore.toFixed(2)})` : 'Data Unavailable'}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Cost of Living (0-5, 5 is cheaper)</span>
+                            <span class="stat-value">${c.displayCpi !== 'Data Missing' ? `${c.displayCpi} (+${c.cpiScore.toFixed(2)})` : 'Data Unavailable'}</span>
+                        </div>
                     </div>
                     <!-- Penalties sit cleanly below the grid -->
                     <div style="margin-top: 10px;">
@@ -277,7 +314,11 @@ async function init() {
                 microstatePenaltyText: calc.microstatePenaltyText,
                 advisoryLevel: calc.advisoryLevel,
                 advisoryWarning: calc.advisoryWarning,
-                advisoryPageUrl: countryAdvisory ? countryAdvisory.pageUrl : null 
+                advisoryPageUrl: countryAdvisory ? countryAdvisory.pageUrl : null,
+                displayGdp: calc.displayGdp,
+                gdpScore: calc.gdpScore,
+                displayCpi: calc.displayCpi,
+                cpiScore: calc.cpiScore
             });
         }
 
