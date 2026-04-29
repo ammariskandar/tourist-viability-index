@@ -553,7 +553,7 @@ function renderList(rankedCountries) {
                     const images = await fetchCountryImages(countryName, isoCode);
                     
                     if (images.length > 0) {
-                        const imgElements = images.map(url => `<img src="${url}" style="width: calc(50% - 5px); height: 300px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">`).join('');
+                        const imgElements = images.map(url => `<img src="${url}" style="width: calc(50% - 5px); height: 400px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">`).join('');
                         imgContainer.innerHTML = imgElements;
                     } else {
                         imgContainer.style.display = 'none';
