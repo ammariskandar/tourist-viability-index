@@ -64,7 +64,7 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
     }
 
     // Default to neutral 2.5/5 if data is missing
-    let cliScore = 2.50; 
+    let cliScore = 4.50; 
     let displayCli = "Data Missing";
     
     if (raw.cli !== null && raw.cli !== undefined) {
