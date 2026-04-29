@@ -18,6 +18,7 @@ const EUROCENTRIC_NATIONS = [
 ];
 
 const UNESCO_TOP_10 = ['IT', 'CN', 'DE', 'ES', 'FR', 'IN', 'MX', 'GB', 'RU', 'IR'];
+const UNESCO_MIN_6 = ['IT', 'CN', 'DE', 'FR', 'ES', 'IN', 'MX', 'GB', 'RU', 'IR', 'US', 'JP', 'BR', 'CA', 'TR', 'AU', 'GR', 'PL', 'CZ', 'PT', 'KR', 'BE', 'SE', 'PE', 'NL', 'CH', 'ET', 'ZA', 'AR', 'AT', 'RO', 'DK', 'ID', 'BG', 'HR', 'CO', 'MA', 'TN', 'CU', 'IL', 'VN', 'TH', 'KE', 'UA', 'SA', 'LK', 'HU', 'SK', 'EG', 'TZ', 'DZ', 'UZ', 'CL', 'SN', 'BO', 'JO', 'FI', 'PK', 'PH', 'IQ', 'SY', 'KZ', 'LB', 'MN'];
 
 const NATURE_TOP_8 = ['GR', 'IT', 'CH', 'ES', 'NZ', 'TH', 'No', 'IS',];
 
@@ -165,10 +166,25 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         }
     }
 
-    let isUnescoTop10 = "No";
-    if (UNESCO_TOP_10.includes(country.iso_code)) {
+    let unescoCombinedStatus = "Standard (6+ Sites, 0)";
+    let unescoCombinedColor = "color: #7f8c8d;"; 
+
+    
+    if (UNESCO_TOP_10.includes(country.iso_code)) { 
         totalScore += 5;
-        isUnescoTop10 = "Yes (+5 Score)";
+        unescoCombinedStatus = "Top 10 Globally (+5)";
+        unescoCombinedColor = "color: #27ae60;"
+    } 
+    // 2. Otherwise, check for the Penalty
+    else if (!UNESCO_MIN_6.includes(country.iso_code)) {
+        if (MICROSTATES.includes(country.iso_code)) {
+            unescoCombinedStatus = "Less than 6 Sites (Microstate Exemption, 0)";
+            unescoCombinedColor = "color: #7f8c8d;";
+        } else {
+            totalScore -= 10;
+            unescoCombinedStatus = "Less than 6 Sites (-10)";
+            unescoCombinedColor = "color: #c0392b;";
+        }
     }
 
     let isNatureTop8 = "No";
@@ -315,7 +331,9 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         connectivityStatus: connectivityStatus,
         connectivityColor: connectivityColor,
         michelinStatus: michelinStatus,
-        michelinColor: michelinColor
+        michelinColor: michelinColor,
+        unescoPenaltyStatus: unescoPenaltyStatus,
+        unescoPenaltyColor: unescoPenaltyColor
     };
 }
 
@@ -517,7 +535,9 @@ function processAndRenderData() {
             connectivityStatus: calc.connectivityStatus,
             connectivityColor: calc.connectivityColor,
             michelinStatus: calc.michelinStatus,
-            michelinColor: calc.michelinColor
+            michelinColor: calc.michelinColor,
+            unescoPenaltyStatus: calc.unescoPenaltyStatus,
+            unescoPenaltyColor: calc.unescoPenaltyColor
         });
     }
 
