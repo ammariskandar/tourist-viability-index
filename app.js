@@ -507,66 +507,29 @@ async function init() {
             console.warn("Smartraveller API unavailable. Continuing without live warnings.");
         }
 
-        const processedData = [];
-
-        // Process each country
+        // --- THE FIX IS HERE ---
+        // 1. Store the raw data into our global array so the toggle can reuse it instantly
         for (const country of staticData) {
             const liveAqi = await fetchLiveAQI(country.iso_code);
             const countryAdvisory = advisories[country.iso_code]; 
             
-            const calc = calculateFinalScore(country, liveAqi, countryAdvisory);
-            
-            processedData.push({
-                ...country,
-                final_score: calc.score,
-                penaltyApplied: calc.penaltyApplied,
-                isolationPenaltyText: calc.isolationPenaltyText,
-                microstatePenaltyText: calc.microstatePenaltyText,
-                eurocentricPenaltyText: calc.eurocentricPenaltyText,
-                advisoryLevel: calc.advisoryLevel,
-                advisoryWarning: calc.advisoryWarning,
-                advisoryPageUrl: countryAdvisory ? countryAdvisory.pageUrl : null,
-                displayGdp: calc.displayGdp,
-                gdpScore: calc.gdpScore,
-                displayCli: calc.displayCli,
-                cliScore: calc.cliScore,
-                isUnescoTop10: calc.isUnescoTop10,
-                isNatureTop3: calc.isNatureTop3,
-                muslimFriendlyStatus: calc.muslimFriendlyStatus,
-                muslimFriendlyColor: calc.muslimFriendlyColor,
-                holySiteStatus: calc.holySiteStatus,
-                overtourismStatus: calc.overtourismStatus,
-                overtourismColor: calc.overtourismColor,
-                censorshipStatus: calc.censorshipStatus,
-                censorshipColor: calc.censorshipColor,
-                connectivityStatus: calc.connectivityStatus,
-                connectivityColor: calc.connectivityColor,
-                michelinStatus: calc.michelinStatus,
-                michelinColor: calc.michelinColor
-            });
+            rawCountriesData.push({ country, liveAqi, countryAdvisory });
         }
 
-        // Sort Highest to Lowest
-        processedData.sort((a, b) => b.final_score - a.final_score);
+        // 2. Run the math and render the initial default state (using the function we just made)
+        processAndRenderData();
 
-        // Stamp the true rank
-        processedData.forEach((c, i) => {
-            c.original_rank = i + 1;
-        });
-
-        allCountriesData = processedData;
-
-        renderList(allCountriesData);
-
+        // 3. Setup Event Listeners
         const searchInput = document.getElementById('searchInput');
         searchInput.style.display = 'block';
         
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filteredData = allCountriesData.filter(c => 
-                c.country.toLowerCase().includes(searchTerm)
-            );
-            renderList(filteredData);
+        searchInput.addEventListener('input', () => {
+            processAndRenderData(); // Trigger the pipeline when typing
+        });
+
+        // 4. THIS WAS MISSING: Listen for the toggle click!
+        document.getElementById('soloToggle').addEventListener('change', () => {
+            processAndRenderData(); // Trigger the pipeline when toggled
         });
 
     } catch (error) {
@@ -574,82 +537,5 @@ async function init() {
         document.getElementById('loading').innerText = "Error loading data.";
     }
 }
-function processAndRenderData() {
-    // 1. Check if the user has Solo Mode turned on
-    const isSoloMode = document.getElementById('soloToggle').checked;
-    const processedData = [];
 
-    // 2. Loop through the raw data and run the math engine for every country
-    for (const item of rawCountriesData) {
-        const calc = calculateFinalScore(item.country, item.liveAqi, item.countryAdvisory, isSoloMode);
-        
-        // 3. Package all the math results and UI text into a clean object
-        processedData.push({
-            ...item.country,
-            final_score: calc.score,
-            
-            // Base Penalties
-            penaltyApplied: calc.penaltyApplied,
-            isolationPenaltyText: calc.isolationPenaltyText,
-            microstatePenaltyText: calc.microstatePenaltyText,
-            eurocentricPenaltyText: calc.eurocentricPenaltyText,
-            
-            // Smartraveller API Data
-            advisoryLevel: calc.advisoryLevel,
-            advisoryWarning: calc.advisoryWarning,
-            advisoryPageUrl: item.countryAdvisory ? item.countryAdvisory.pageUrl : null,
-            
-            // Economic Data
-            displayGdp: calc.displayGdp,
-            gdpScore: calc.gdpScore,
-            displayCli: calc.displayCli,
-            cliScore: calc.cliScore,
-            
-            // Culture & Nature Bonuses
-            isUnescoTop10: calc.isUnescoTop10,
-            isNatureTop3: calc.isNatureTop3,
-            
-            // Inclusivity & Religion
-            muslimFriendlyStatus: calc.muslimFriendlyStatus,
-            muslimFriendlyColor: calc.muslimFriendlyColor,
-            holySiteStatus: calc.holySiteStatus,
-            
-            // Overtourism & Censorship
-            overtourismStatus: calc.overtourismStatus,
-            overtourismColor: calc.overtourismColor,
-            censorshipStatus: calc.censorshipStatus,
-            censorshipColor: calc.censorshipColor,
-            
-            // Connectivity & Culinary
-            connectivityStatus: calc.connectivityStatus,
-            connectivityColor: calc.connectivityColor,
-            michelinStatus: calc.michelinStatus,
-            michelinColor: calc.michelinColor
-        });
-    }
-
-    // 4. Sort the entire list from Highest Score to Lowest Score
-    processedData.sort((a, b) => b.final_score - a.final_score);
-
-    // 5. Stamp the true rank onto each country (1st, 2nd, 3rd...)
-    processedData.forEach((c, i) => {
-        c.original_rank = i + 1;
-    });
-
-    // 6. Save this fully processed list to the global variable so the search bar can use it
-    allCountriesData = processedData;
-
-    // 7. Check if the user is currently searching for a specific country
-    const searchInput = document.getElementById('searchInput');
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
-    
-    if (searchTerm) {
-        // If they are searching, only render the matches
-        const filteredData = allCountriesData.filter(c => c.country.toLowerCase().includes(searchTerm));
-        renderList(filteredData);
-    } else {
-        // Otherwise, render the whole list
-        renderList(allCountriesData);
-    }
-}
 init();
