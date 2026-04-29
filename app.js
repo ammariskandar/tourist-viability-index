@@ -9,7 +9,7 @@ const WEIGHTS = {
 };
 
 // --- 2. THE MATH ENGINE ---
-function calculateFinalScore(country, liveAqi) {
+function calculateFinalScore(country, liveAqi, advisoryData) {
     const raw = country.scores_raw;
     
     // Normalizations
@@ -24,12 +24,10 @@ function calculateFinalScore(country, liveAqi) {
 
     // Femicide fallback logic
     if (raw.femicide_rate === null) {
-        // Apply 1.2x penalty to homicide rate
         const penalizedHom = raw.homicide_rate * 1.7;
         homicideScore = Math.max(0, ((50 - penalizedHom) / 50) * 100);
         femicideScore = 0; 
         
-        // Reallocate weights
         finalHomicideWeight = 0.62;
         finalFemicideWeight = 0;
         penaltyApplied = true;
@@ -48,9 +46,9 @@ function calculateFinalScore(country, liveAqi) {
         (diplomacyScore * WEIGHTS.diplomacy) +
         (aqiScore * WEIGHTS.aqi) +
         (homicideScore * finalHomicideWeight) +
-        (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35 *2.5);
+        (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35 * 2.5);
 
-    // --- NEW: Isolation / Diplomacy Penalty ---
+    // Isolation / Diplomacy Penalty
     let isolationPenaltyText = '';
     
     if (raw.passport_vfs < 33) {
@@ -64,33 +62,49 @@ function calculateFinalScore(country, liveAqi) {
         isolationPenaltyText = '*Moderate inaccesibility penalty applied (-5)';
     }
 
+    // --- NEW: Smartraveller API Penalty ---
+    let advisoryLevel = null;
+    let advisoryWarning = null;
+
+    if (advisoryData) {
+        if (advisoryData.level >= 4) {
+            totalScore -= 50; // -50 penalty for Level 4+
+            advisoryLevel = advisoryData.level;
+            advisoryWarning = advisoryData.advice;
+        } else if (advisoryData.level === 3) {
+            totalScore -= 10; // -10 penalty for Level 3
+            advisoryLevel = advisoryData.level;
+            advisoryWarning = advisoryData.advice;
+        }
+    }
+
     // Ensure the score doesn't drop below 0 to keep the UI clean
     totalScore = Math.max(0, totalScore);
 
     return {
         score: totalScore.toFixed(2),
-        penaltyApplied: penaltyApplied, // The femicide flag
-        isolationPenaltyText: isolationPenaltyText // The new diplomacy flag
+        penaltyApplied: penaltyApplied,
+        isolationPenaltyText: isolationPenaltyText,
+        advisoryLevel: advisoryLevel,
+        advisoryWarning: advisoryWarning
     };
 }
 
 // --- 3. DATA FETCHING ---
 async function fetchStaticData() {
-    // Fetch the actual JSON file
     const response = await fetch('./countries_safety_data.json');
     return await response.json();
 }
 
 async function fetchLiveAQI(isoCode) {
-    // Deterministic mock generator: creates a stable AQI (15-95) based on the ISO string
     let hash = 0;
     for (let i = 0; i < isoCode.length; i++) {
         hash = isoCode.charCodeAt(i) + ((hash << 5) - hash);
     }
-    // Convert the hash to an absolute number between 15 and 95
     const mockAqi = Math.abs(hash % 80) + 15;
     return mockAqi;
-} 
+}
+
 // --- 4. RENDER TO DOM ---
 function renderList(rankedCountries) {
     const container = document.getElementById('results-container');
@@ -98,12 +112,10 @@ function renderList(rankedCountries) {
     
     let html = '';
     
-    rankedCountries.forEach((c, index) => {
-        // Penalty flags
+    rankedCountries.forEach((c) => {
         const femicideText = c.penaltyApplied ? `<br><span class="penalty-flag">*Femicide data missing, homicide penalty applied (1.7x)</span>` : '';
         const isolationText = c.isolationPenaltyText ? `<br><span class="penalty-flag">${c.isolationPenaltyText}</span>` : '';
         
-        // Status Indicator Logic
         let statusText = '';
         let statusClass = '';
         
@@ -121,16 +133,26 @@ function renderList(rankedCountries) {
             statusClass = 'status-danger';
         }
 
-        // --- NEW: Palestine specific addition ---
         if (c.country === 'Palestine') {
             statusText += ' #FreePalestine';
         }
         
-        // Notice the inline style has been replaced by the "status-indicator" class
+        // --- NEW: Advisory Toast HTML ---
+        let advisoryToast = '';
+        if (c.advisoryLevel && c.advisoryLevel >= 3) {
+            const toastClass = c.advisoryLevel >= 4 ? 'advisory-level-4' : 'advisory-level-3';
+            advisoryToast = `<span class="advisory-toast ${toastClass}">⚠️ Level ${c.advisoryLevel}: ${c.advisoryWarning}</span>`;
+        }
+
         html += `
             <div class="country-card">
                 <div class="card-header">
-                    <h2 style="margin: 0;"><span class="rank-number">#${c.original_rank}</span> <span class="country-name">${c.country}</span> <span class="status-indicator ${statusClass}">${statusText}</span></h2>
+                    <h2 style="margin: 0;">
+                        <span class="rank-number">#${c.original_rank}</span> 
+                        <span class="country-name">${c.country}</span> 
+                        <span class="status-indicator ${statusClass}">${statusText}</span>
+                        ${advisoryToast}
+                    </h2>
                     <div class="score">${c.final_score}</div>
                 </div>
                 <div class="details">
@@ -144,7 +166,6 @@ function renderList(rankedCountries) {
     
     container.innerHTML = html;
 
-    // --- ACCORDION EVENT LISTENERS ---
     const headers = document.querySelectorAll('.card-header');
     headers.forEach(header => {
         header.addEventListener('click', function() {
@@ -158,18 +179,44 @@ function renderList(rankedCountries) {
 async function init() {
     try {
         const staticData = await fetchStaticData();
+        
+        // --- NEW: Fetch Advisories Safely ---
+        let advisories = {};
+        try {
+            // We fetch the 'advisories' list which contains all countries to save API calls
+            const advResponse = await fetch('https://smartraveller.kevle.xyz/api/advisories');
+            if (advResponse.ok) {
+                const advData = await advResponse.json();
+                if (advData && advData.advisories) {
+                    advData.advisories.forEach(item => {
+                        // Map the advisory to the 2-letter ISO code
+                        if (item.country && item.country.alpha2) {
+                            advisories[item.country.alpha2] = item;
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn("Smartraveller API unavailable. Continuing without live warnings.");
+        }
+
         const processedData = [];
 
         // Process each country
         for (const country of staticData) {
             const liveAqi = await fetchLiveAQI(country.iso_code);
-            const calc = calculateFinalScore(country, liveAqi);
+            const countryAdvisory = advisories[country.iso_code]; // Look up the specific country
+            
+            // Pass the advisory data into the math engine
+            const calc = calculateFinalScore(country, liveAqi, countryAdvisory);
             
             processedData.push({
                 ...country,
                 final_score: parseFloat(calc.score),
                 penaltyApplied: calc.penaltyApplied,
-                isolationPenaltyText: calc.isolationPenaltyText
+                isolationPenaltyText: calc.isolationPenaltyText,
+                advisoryLevel: calc.advisoryLevel,
+                advisoryWarning: calc.advisoryWarning
             });
         }
 
@@ -181,10 +228,8 @@ async function init() {
             c.original_rank = i + 1;
         });
 
-        // Save to global master list
         allCountriesData = processedData;
 
-        // Render the initial full list
         renderList(allCountriesData);
 
         // Reveal the search bar and attach the listener
@@ -193,11 +238,9 @@ async function init() {
         
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            // Filter the master list
             const filteredData = allCountriesData.filter(c => 
                 c.country.toLowerCase().includes(searchTerm)
             );
-            // Re-render with the filtered results
             renderList(filteredData);
         });
 
@@ -207,5 +250,4 @@ async function init() {
     }
 }
 
-// Boot the app
 init();

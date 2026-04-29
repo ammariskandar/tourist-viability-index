@@ -117,6 +117,28 @@
             }
         }
 
+        /* --- Advisory Toast --- */
+        .advisory-toast {
+            font-size: 0.75rem;
+            margin-left: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid;
+            display: inline-flex;
+            align-items: center;
+            font-weight: normal;
+            background-color: #fff;
+            vertical-align: middle;
+        }
+        .advisory-level-3 {
+            color: #e67e22; /* Orange for Level 3 */
+            border-color: #e67e22;
+        }
+        .advisory-level-4 {
+            color: #c0392b; /* Red for Level 4+ */
+            border-color: #c0392b;
+        }
+
         /* --- Mobile Responsiveness --- */
         @media (max-width: 700px) {
             /* 1. Hide the subheadings entirely */
@@ -150,6 +172,12 @@
             .rank-number {
                 font-size: 58%; 
                 margin-right: 2px; 
+            }
+            .advisory-toast {
+                display: inline-block; 
+                margin-left: 0;
+                margin-top: 5px;
+                font-size: 0.6rem;
             }
         }
 
