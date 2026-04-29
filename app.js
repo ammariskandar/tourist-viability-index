@@ -36,6 +36,9 @@ const HOLY_SITE_ABRAHAMIC = ['IL', 'PS']; // Jerusalem (Muslim, Jewish, Christia
 const HOLY_SITE_CATHOLIC = ['IT', 'VA']; // Rome & Vatican City
 const HOLY_SITE_ORTHODOX = ['RU', 'GR']; // Moscow & Mount Athos
 
+// --- Overtourism Penalty ---
+const OVERTOURISM_NATIONS = ['ES', 'IT', 'GR', 'NL', 'FR', 'JP', 'TH', 'VA', 'MA'];
+
 // --- 2. THE MATH ENGINE ---
 function calculateFinalScore(country, liveAqi, advisoryData) {
     const raw = country.scores_raw;
@@ -193,6 +196,23 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         totalScore += 25;
         holySiteStatus = "Orthodox Holy Site (+25)";
     }
+    
+
+    // --- NEW: Overtourism Penalty ---
+    let overtourismStatus = "No";
+    let overtourismColor = "";
+
+    if (OVERTOURISM_NATIONS.includes(country.iso_code)) {
+        if (MICROSTATES.includes(country.iso_code)) {
+            totalScore -= 10;
+            overtourismStatus = "Yes (-10, but Microstate)";
+            overtourismColor = "color: #e67e22;"; // Orange warning text
+        } else {
+            totalScore -= 20;
+            overtourismStatus = "Yes (-20)";
+            overtourismColor = "color: #c0392b;"; // Red penalty text
+        }
+    }
 
     // Ensure the score doesn't drop below 0
     totalScore = Math.max(0, totalScore);
@@ -213,7 +233,9 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         isNatureTop3: isNatureTop3,
         muslimFriendlyStatus: muslimFriendlyStatus,
         muslimFriendlyColor: muslimFriendlyColor,
-        holySiteStatus: holySiteStatus
+        holySiteStatus: holySiteStatus,
+        overtourismStatus: overtourismStatus,
+        overtourismColor: overtourismColor    
     };
 }
 
@@ -338,6 +360,10 @@ function renderList(rankedCountries) {
                             <span class="stat-label">Major Religious Pilgrimage Site?</span>
                             <span class="stat-value" style="${c.holySiteStatus !== 'None' ? 'color: #8e44ad; font-weight: bold;' : ''}">${c.holySiteStatus}</span>
                         </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Suffering from Overtourism?</span>
+                            <span class="stat-value" style="${c.overtourismColor}">${c.overtourismStatus}</span>
+                        </div>
                     </div>
                     <!-- Penalties sit cleanly below the grid -->
                     <div style="margin-top: 10px;">
@@ -411,7 +437,9 @@ async function init() {
                 isNatureTop3: calc.isNatureTop3,
                 muslimFriendlyStatus: calc.muslimFriendlyStatus,
                 muslimFriendlyColor: calc.muslimFriendlyColor,
-                holySiteStatus: calc.holySiteStatus
+                holySiteStatus: calc.holySiteStatus,
+                overtourismStatus: calc.overtourismStatus, 
+                overtourismColor: calc.overtourismColor
             });
         }
 
