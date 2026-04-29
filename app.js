@@ -25,6 +25,11 @@ const UNESCO_TOP_10 = ['IT', 'CN', 'DE', 'ES', 'FR', 'IN', 'MX', 'GB', 'RU', 'IR
 // Top 3 Most Beautiful Nature Landscapes (CEOWORLD/SEAsia Survey)
 const NATURE_TOP_3 = ['CN', 'AU', 'BR'];
 
+// --- Travel Persona Metrics ---
+const MUSLIM_MAJORITY = ['MV', 'MR', 'IR', 'SO', 'AF', 'DJ', 'EH', 'DZ', 'MA', 'KM', 'NE', 'TJ', 'TN', 'PS', 'AZ', 'JO', 'SN', 'YE', 'LY', 'YT', 'PK', 'GM', 'ML', 'SA', 'SD', 'IQ', 'TM', 'XK', 'TR', 'BD', 'EG', 'GN', 'UZ', 'ID', 'SY', 'OM', 'BN', 'KG', 'SL', 'QA', 'KW', 'BH', 'AE', 'KZ', 'LB', 'BF', 'MY', 'TD', 'ER', 'AL', 'BA'];
+const MUSLIM_FRIENDLY = ['NG', 'ET', 'TZ', 'RU', 'CN', 'CD', 'CI', 'CM', 'GH', 'MZ', 'TH', 'DE'];
+const MUSLIM_HOSTILE = ['FR', 'IN', 'US', 'IL', 'GB'];
+
 // --- 2. THE MATH ENGINE ---
 function calculateFinalScore(country, liveAqi, advisoryData) {
     const raw = country.scores_raw;
@@ -148,6 +153,25 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         isNatureTop3 = "Yes (+10 Score)";
     }
 
+    // --- NEW: Muslim-Friendly Travel Metric ---
+    let muslimFriendlyStatus = "Neutral (0)";
+    let muslimFriendlyColor = ""; // UI styling
+
+    if (MUSLIM_MAJORITY.includes(country.iso_code)) {
+        totalScore += 1;
+        muslimFriendlyStatus = "Muslim-Majority (+1)";
+        muslimFriendlyColor = "color: #2980b9;"; // Blue
+    } else if (MUSLIM_FRIENDLY.includes(country.iso_code)) {
+        totalScore += 5;
+        muslimFriendlyStatus = "Muslim-Friendly (+5)";
+        muslimFriendlyColor = "color: #27ae60;"; // Green
+    } else if (MUSLIM_HOSTILE.includes(country.iso_code)) {
+        totalScore -= 5;
+        muslimFriendlyStatus = "Muslim-Hostile (-5)";
+        muslimFriendlyColor = "color: #c0392b;"; // Red
+    }
+
+    // Ensure the score doesn't drop below 0
     totalScore = Math.max(0, totalScore);
 
     return {
@@ -163,7 +187,9 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         displayCli: displayCli,
         cliScore: cliScore,
         isUnescoTop10: isUnescoTop10, 
-        isNatureTop3: isNatureTop3  
+        isNatureTop3: isNatureTop3,
+        muslimFriendlyStatus: muslimFriendlyStatus,
+        muslimFriendlyColor: muslimFriendlyColor
     };
 }
 
@@ -280,6 +306,10 @@ function renderList(rankedCountries) {
                             <span class="stat-label">Top 3 Most Beautiful Nature Landscapes?</span>
                             <span class="stat-value" style="${c.isNatureTop3.startsWith('Yes') ? 'color: #27ae60;' : ''}">${c.isNatureTop3}</span>
                         </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Muslim-Friendly Travel?</span>
+                            <span class="stat-value" style="${c.muslimFriendlyColor}">${c.muslimFriendlyStatus}</span>
+                        </div>
                     </div>
                     <!-- Penalties sit cleanly below the grid -->
                     <div style="margin-top: 10px;">
@@ -350,7 +380,9 @@ async function init() {
                 displayCli: calc.displayCli,
                 cliScore: calc.cliScore,
                 isUnescoTop10: calc.isUnescoTop10,
-                isNatureTop3: calc.isNatureTop3 
+                isNatureTop3: calc.isNatureTop3,
+                muslimFriendlyStatus: calc.muslimFriendlyStatus,
+                muslimFriendlyColor: calc.muslimFriendlyColor 
             });
         }
 
