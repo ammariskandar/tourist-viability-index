@@ -351,6 +351,33 @@ async function fetchLiveAQI(isoCode) {
     return mockAqi;
 }
 
+async function fetchCountryImages(countryName) {
+    const searchQuery = encodeURIComponent(`${countryName} landscape`);
+    const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${searchQuery}&gsrnamespace=6&gsrlimit=10&prop=imageinfo&iiprop=url&format=json&origin=*`;
+    
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const pages = data.query?.pages;
+        
+        if (!pages) return [];
+        
+        let urls = [];
+        for (const key in pages) {
+            const imgUrl = pages[key].imageinfo?.[0]?.url;
+            const lowerUrl = imgUrl?.toLowerCase() || "";
+            
+            if (imgUrl && !lowerUrl.includes('.svg') && !lowerUrl.includes('map') && !lowerUrl.includes('flag') && !lowerUrl.includes('logo')) {
+                urls.push(imgUrl);
+                if (urls.length === 2) break;
+            }
+        }
+        return urls;
+    } catch (e) {
+        return [];
+    }
+}
+
 function renderList(rankedCountries) {
     const container = document.getElementById('results-container');
     document.getElementById('loading').style.display = 'none';
@@ -408,13 +435,14 @@ function renderList(rankedCountries) {
                 <div class="card-header">
                     <h2 style="margin: 0;">
                         <span class="rank-number">#${c.original_rank}</span> 
-                        <span class="country-name">${c.country}</span>${overtourismBadge}
+                        <span class="country-name" data-name="${c.country}">${c.country}</span>${overtourismBadge}
                         <span class="status-indicator ${statusClass}">${statusText}</span>
                         ${advisoryToast}
                     </h2>
                     <div class="score">${displayScore}</div>
                 </div>
                 <div class="details">
+                    <div class="country-images" style="display: flex; gap: 10px; margin-bottom: 15px; width: 100%;"></div>
                     <div class="stats-grid">
                         <div class="stat-box">
                             <span class="stat-label">General Risk (Higher is Worse)</span>
@@ -492,9 +520,28 @@ function renderList(rankedCountries) {
 
     const headers = document.querySelectorAll('.card-header');
     headers.forEach(header => {
-        header.addEventListener('click', function() {
+        header.addEventListener('click', async function() {
             const detailsDiv = this.nextElementSibling;
             detailsDiv.classList.toggle('show');
+
+            if (detailsDiv.classList.contains('show')) {
+                const imgContainer = detailsDiv.querySelector('.country-images');
+                
+                if (imgContainer && !imgContainer.dataset.loaded) {
+                    imgContainer.dataset.loaded = "true";
+                    imgContainer.innerHTML = '<span style="font-size: 12px; color: #7f8c8d; padding: 10px 0;">Loading landscape photos...</span>';
+                    
+                    const countryName = this.querySelector('.country-name').getAttribute('data-name');
+                    const images = await fetchCountryImages(countryName);
+                    
+                    if (images.length > 0) {
+                        const imgElements = images.map(url => `<img src="${url}" style="width: calc(50% - 5px); height: 200px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">`).join('');
+                        imgContainer.innerHTML = imgElements;
+                    } else {
+                        imgContainer.style.display = 'none';
+                    }
+                }
+            }
         });
     });
 }
