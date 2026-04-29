@@ -43,6 +43,14 @@ const OVERTOURISM_NATIONS = ['ES', 'IT', 'GR', 'NL', 'FR', 'JP', 'TH', 'VA', 'MA
 const CENSORSHIP_ABSOLUTE = ['KP', 'TM']; // North Korea, Turkmenistan
 const CENSORSHIP_HIGH = ['ER', 'CN', 'IR', 'CU', 'BY']; // Eritrea, China, Iran, Cuba, Belarus
 
+// --- IATA Air Connectivity Index (2025) ---
+const IATA_TOP_20 = ['US', 'GB', 'CN', 'DE', 'JP', 'ES', 'IT', 'AE', 'FR', 'IN', 'TH', 'KR', 'TR', 'CA', 'SG', 'MX', 'HK', 'SA', 'TW', 'MY'];
+const IATA_21_80 = ['VN', 'AU', 'ID', 'NL', 'CH', 'QA', 'PT', 'GR', 'PH', 'EG', 'IE', 'PL', 'RU', 'AT', 'DK', 'BR', 'PK', 'BE', 'MA', 'SE', 'DO', 'NO', 'CO', 'KW', 'FI', 'RO', 'IL', 'CZ', 'HU', 'NZ', 'PA', 'BD', 'AR', 'ZA', 'ET', 'CY', 'BH', 'OM', 'LK', 'DZ', 'IR', 'JO', 'HR', 'PE', 'RS', 'KH', 'CL', 'CR', 'UZ', 'TN', 'LB', 'KZ', 'MO', 'IQ', 'MV', 'JM', 'IS', 'NP', 'KE', 'BG'];
+const IATA_81_100 = ['MT', 'SV', 'AZ', 'GE', 'AL', 'BS', 'NG', 'EC', 'CU', 'GT', 'LV', 'MU', 'LU', 'MD', 'TZ', 'LT', 'AW', 'LA', 'MM', 'AM'];
+
+// --- Culinary Tourism Bonus ---
+const MICHELIN_TOP_10 = ['FR', 'AE', 'IT', 'JP', 'DE', 'ES', 'US', 'GB', 'CH', 'CN'];
+
 // --- 2. THE MATH ENGINE ---
 function calculateFinalScore(country, liveAqi, advisoryData) {
     const raw = country.scores_raw;
@@ -232,6 +240,44 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         censorshipColor = "color: #e67e22;"; // Orange
     }
 
+    // --- NEW: IATA Flight Connectivity Penalty/Bonus ---
+    let connectivityStatus = "";
+    let connectivityColor = "";
+
+    if (IATA_TOP_20.includes(country.iso_code)) {
+        totalScore += 5;
+        connectivityStatus = "Top 20 Globably (+5)";
+        connectivityColor = "color: #27ae60;"; // Green
+    } else if (IATA_21_80.includes(country.iso_code)) {
+        // No points added or subtracted, just setting the UI text
+        connectivityStatus = "Ranked 21-80 (0)";
+        connectivityColor = "color: #7f8c8d;"; // Gray neutral
+    } else if (IATA_81_100.includes(country.iso_code)) {
+        totalScore -= 5;
+        connectivityStatus = "Ranked 81-100 (-5)";
+        connectivityColor = "color: #e67e22;"; // Orange
+    } else {
+        // Not in top 100. Check if Microstate exemption applies.
+        if (MICROSTATES.includes(country.iso_code)) {
+            connectivityStatus = "Not Listed (Microstate Exemption, 0)";
+            connectivityColor = "color: #7f8c8d;"; // Gray neutral
+        } else {
+            totalScore -= 10;
+            connectivityStatus = "Not in Top 100 (-10)";
+            connectivityColor = "color: #c0392b; font-weight: bold;"; // Red penalty
+        }
+    }
+
+    // --- NEW: Culinary Bonus (Michelin) ---
+    let michelinStatus = "No";
+    let michelinColor = "";
+
+    if (MICHELIN_TOP_10.includes(country.iso_code)) {
+        totalScore += 2.5;
+        michelinStatus = "Top 10 Globally (+2.5)";
+        michelinColor = "color: #27ae60;"; // Green bonus text
+    }
+
     // Ensure the score doesn't drop below 0
     totalScore = Math.max(0, totalScore);
 
@@ -255,7 +301,11 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         overtourismStatus: overtourismStatus,
         overtourismColor: overtourismColor,
         censorshipStatus: censorshipStatus,
-        censorshipColor: censorshipColor  
+        censorshipColor: censorshipColor,
+        connectivityStatus: connectivityStatus,
+        connectivityColor: connectivityColor,
+        michelinStatus: michelinStatus,
+        michelinColor: michelinColor
     };
 }
 
@@ -388,6 +438,14 @@ function renderList(rankedCountries) {
                             <span class="stat-label">Strict Laws & Censorship?</span>
                             <span class="stat-value" style="${c.censorshipColor}">${c.censorshipStatus}</span>
                         </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Flight Connectivity (IATA Rank)</span>
+                            <span class="stat-value" style="${c.connectivityColor}">${c.connectivityStatus}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Top 10 Most Michelin Stars?</span>
+                            <span class="stat-value" style="${c.michelinColor}">${c.michelinStatus}</span>
+                        </div>
                     </div>
                     <!-- Penalties sit cleanly below the grid -->
                     <div style="margin-top: 10px;">
@@ -465,7 +523,11 @@ async function init() {
                 overtourismStatus: calc.overtourismStatus,
                 overtourismColor: calc.overtourismColor,
                 censorshipStatus: calc.censorshipStatus,
-                censorshipColor: calc.censorshipColor
+                censorshipColor: calc.censorshipColor,
+                connectivityStatus: calc.connectivityStatus,
+                connectivityColor: calc.connectivityColor,
+                michelinStatus: calc.michelinStatus,
+                michelinColor: calc.michelinColor
             });
         }
 
