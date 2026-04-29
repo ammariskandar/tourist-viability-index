@@ -83,7 +83,6 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
     // --- NEW: Eurocentric Reporting Adjustment ---
     let eurocentricPenaltyText = '';
     if (EUROCENTRIC_NATIONS.includes(country.iso_code)) {
-        // Calculate 5% of the current score and subtract it
         const deduction = totalScore * 0.05;
         totalScore -= deduction;
         eurocentricPenaltyText = `*Eurocentric reporting adjustment applied (-5%)`;
@@ -105,14 +104,14 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         }
     }
 
-    // Ensure the score doesn't drop below 0 to keep the UI clean
     totalScore = Math.max(0, totalScore);
 
     return {
-        score: totalScore, // Keep as raw number for sorting, do not use .toFixed() here yet
+        score: totalScore, 
         penaltyApplied: penaltyApplied,
         isolationPenaltyText: isolationPenaltyText,
         microstatePenaltyText: microstatePenaltyText,
+        eurocentricPenaltyText: eurocentricPenaltyText,
         advisoryLevel: advisoryLevel,
         advisoryWarning: advisoryWarning
     };
@@ -272,7 +271,7 @@ async function init() {
             
             processedData.push({
                 ...country,
-                final_score: calc.score, // Stored as a strict Number type for accurate sorting
+                final_score: calc.score,
                 penaltyApplied: calc.penaltyApplied,
                 isolationPenaltyText: calc.isolationPenaltyText,
                 microstatePenaltyText: calc.microstatePenaltyText,
