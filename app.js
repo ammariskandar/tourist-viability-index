@@ -486,6 +486,33 @@ function renderList(rankedCountries) {
 }
 
 // --- 5. INITIALIZATION ---
+function processAndRenderData() {
+    const isSoloMode = document.getElementById('soloToggle').checked;
+    const processedData = [];
+
+    for (const item of rawCountriesData) {
+        // ... (All the math and pushing we built earlier) ...
+    }
+
+    processedData.sort((a, b) => b.final_score - a.final_score);
+    
+    processedData.forEach((c, i) => {
+        c.original_rank = i + 1;
+    });
+
+    allCountriesData = processedData;
+
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
+    
+    if (searchTerm) {
+        const filteredData = allCountriesData.filter(c => c.country.toLowerCase().includes(searchTerm));
+        renderList(filteredData);
+    } else {
+        renderList(allCountriesData);
+    }
+}
+
 async function init() {
     try {
         const staticData = await fetchStaticData();
@@ -537,5 +564,4 @@ async function init() {
         document.getElementById('loading').innerText = "Error loading data.";
     }
 }
-
 init();
