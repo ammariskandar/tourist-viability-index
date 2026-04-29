@@ -404,7 +404,7 @@ function renderList(rankedCountries) {
                 <div class="card-header">
                     <h2 style="margin: 0;">
                         <span class="rank-number">#${c.original_rank}</span> 
-                        <span class="country-name">${c.country}</span> 
+                        <span class="country-name">${c.country} ${overtourismBadge}</span> 
                         <span class="status-indicator ${statusClass}">${statusText}</span>
                         ${advisoryToast}
                     </h2>
@@ -544,6 +544,10 @@ function processAndRenderData() {
 
     processedData.forEach((c, i) => {
         c.original_rank = i + 1;
+        let overtourismBadge = "";
+        if (OVERTOURISM_NATIONS.includes(c.iso_code)) {
+        overtourismBadge = `<span style="background-color: #c0392b; color: white; font-size: 12px; padding: 3px 8px; border-radius: 12px; margin-left: 10px; font-weight: bold; vertical-align: middle; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">⚠️ Overtourism</span>`;
+    }
     });
 
     allCountriesData = processedData;
