@@ -98,7 +98,7 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
             (aqiScore * WEIGHTS.aqi) +
             (homicideScore * finalHomicideWeight*1.15) +
             (femicideScore * finalFemicideWeight*1.35)) * 0.95 +
-            (gdpScore * 0.25) + (cliScore * 0.25) - ((raw.rape_rate) / 35 * 3);
+            (gdpScore * 0.25) + (cliScore * 0.25) - ((raw.rape_rate) / 35 * 5);
     } else {
         totalScore = 
             ((gpiScore * WEIGHTS.gpi) +
@@ -202,13 +202,25 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
 
     if (OVERTOURISM_NATIONS.includes(country.iso_code)) {
         if (MICROSTATES.includes(country.iso_code)) {
-            totalScore -= 10;
-            overtourismStatus = "Yes (-10, but Microstate)";
-            overtourismColor = "color: #e67e22;";
+            if (isSoloMode) {
+                totalScore -= 20;
+                overtourismStatus = "Yes (-20, but Microstate)";
+                overtourismColor = "color: #e67e22;";
+            } else {
+                totalScore -= 10;
+                overtourismStatus = "Yes (-10, but Microstate)";
+                overtourismColor = "color: #e67e22;";
+            }                
         } else {
-            totalScore -= 20;
-            overtourismStatus = "Yes (-20)";
-            overtourismColor = "color: #c0392b;";
+            if (isSoloMode) {
+                totalScore -= 30;
+                overtourismStatus = "Yes (-30)";
+                overtourismColor = "color: #c0392b;";
+            } else {
+                totalScore -= 20;
+                overtourismStatus = "Yes (-20)";
+                overtourismColor = "color: #c0392b;";
+            }
         }
     }
 
