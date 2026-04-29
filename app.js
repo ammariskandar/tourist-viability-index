@@ -331,9 +331,9 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         connectivityStatus: connectivityStatus,
         connectivityColor: connectivityColor,
         michelinStatus: michelinStatus,
-        michelinColor: michelinColor,
-        unescoPenaltyStatus: unescoPenaltyStatus,
-        unescoPenaltyColor: unescoPenaltyColor
+        michelinColor: michelinColor,      
+        unescoCombinedStatus: unescoCombinedStatus,
+        unescoCombinedColor: unescoCombinedColor,
     };
 }
 
@@ -441,8 +441,8 @@ function renderList(rankedCountries) {
                             <span class="stat-value">${c.displayCli !== 'Data Missing' ? `${c.displayCli} (+${c.cliScore.toFixed(2)})` : 'Data Unavailable'}</span>
                         </div>
                         <div class="stat-box">
-                            <span class="stat-label">Top 10 UNESCO Heritage Sites?</span>
-                            <span class="stat-value" style="${c.isUnescoTop10.startsWith('Yes') ? 'color: #27ae60;' : ''}">${c.isUnescoTop10}</span>
+                            <span class="stat-label">UNESCO Heritage Sites</span>
+                            <span class="stat-value" style="${c.unescoCombinedColor}">${c.unescoCombinedStatus}</span>
                         </div>
                         <div class="stat-box">
                             <span class="stat-label">Top 8 Most Beautiful Nature Landscapes? (Popular Vote)</span>
@@ -536,8 +536,8 @@ function processAndRenderData() {
             connectivityColor: calc.connectivityColor,
             michelinStatus: calc.michelinStatus,
             michelinColor: calc.michelinColor,
-            unescoPenaltyStatus: calc.unescoPenaltyStatus,
-            unescoPenaltyColor: calc.unescoPenaltyColor
+            unescoCombinedStatus: calc.unescoCombinedStatus,
+            unescoCombinedColor: calc.unescoCombinedColor
         });
     }
 
