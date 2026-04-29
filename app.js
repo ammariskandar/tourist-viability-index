@@ -351,34 +351,58 @@ async function fetchLiveAQI(isoCode) {
     return mockAqi;
 }
 
-const getPixabayKey = () => atob('NTU2NDcwMDctZWM4NjNmZTY0NzIwY2ZhN2UxODQ1MDFiMg=='); 
+const PIXABAY_KEYS = {
+    primary: 'NTU2NDcwMDctZWM4NjNmZTY0NzIwY2ZhN2UxODQ1MDFiMg==',
+    backup: 'NTU2NDc0NjMtYmU2N2UwYzFhNDkyNGY0OTc1NGY3MWUxMg==' 
+};
 
-const imageCache = {};
+let activeKey = 'primary';
+const getPixabayKey = () => atob(PIXABAY_KEYS[activeKey]);
 
 async function fetchCountryImages(countryName, isoCode) {
-    // 1. Check if we already loaded these photos
-    if (imageCache[isoCode]) {
-        return imageCache[isoCode];
+    const cacheKey = `pixabay_cache_${isoCode}`;
+    const cachedData = localStorage.getItem(cacheKey);
+
+    if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        const ageInMilliseconds = Date.now() - parsedData.timestamp;
+
+        if (ageInMilliseconds < 24 * 60 * 60 * 1000) {
+            return parsedData.urls;
+        }
     }
 
-    // 2. Search Pixabay directly using the Country Name
-    // Added "travel" to the query to heavily bias towards scenic/tourist photos
     const searchQuery = encodeURIComponent(`${countryName} travel`);
-    const url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
+    let url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
     
     try {
-        const res = await fetch(url);
+        let res = await fetch(url);
+
+        if (res.status === 429) {
+            if (activeKey === 'primary') {
+                console.warn("Primary Pixabay key rate limited. Seamlessly switching to backup key...");
+                activeKey = 'backup'; // Swap the active key
+                url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
+                res = await fetch(url);
+            } else {
+                console.error("Both primary and backup Pixabay keys are rate limited.");
+                return [];
+            }
+        }
+
+        if (!res.ok) return [];
+
         const data = await res.json();
         
         if (data.hits && data.hits.length > 0) {
             let urls = [];
             for (let i = 0; i < Math.min(2, data.hits.length); i++) {
-                // webformatURL is perfectly sized for web cards
                 urls.push(data.hits[i].webformatURL); 
             }
-            
-            // 3. Save the result to the cache so we don't fetch it again
-            imageCache[isoCode] = urls;
+            localStorage.setItem(cacheKey, JSON.stringify({
+                urls: urls,
+                timestamp: Date.now()
+            }));
             
             return urls;
         }
