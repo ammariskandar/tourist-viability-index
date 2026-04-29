@@ -351,8 +351,20 @@ async function fetchLiveAQI(isoCode) {
     return mockAqi;
 }
 
-async function fetchCountryImages(countryName) {
-    const searchQuery = encodeURIComponent(`${countryName} landscape`);
+async function fetchCountryImages(countryName, isoCode) {
+    let searchTerm = countryName;
+    try {
+        const rcRes = await fetch(`https://restcountries.com/v3.1/alpha/${isoCode}`);
+        if (rcRes.ok) {
+            const rcData = await rcRes.json();
+            if (rcData[0] && rcData[0].capital && rcData[0].capital[0]) {
+                searchTerm = rcData[0].capital[0]; // e.g., gets "Tokyo" for "JP"
+            }
+        }
+    } catch (e) {
+        console.warn("Could not fetch capital, falling back to country name.");
+    }
+    const searchQuery = encodeURIComponent(`${searchTerm} landmarks`);
     const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${searchQuery}&gsrnamespace=6&gsrlimit=10&prop=imageinfo&iiprop=url&format=json&origin=*`;
     
     try {
@@ -366,8 +378,8 @@ async function fetchCountryImages(countryName) {
         for (const key in pages) {
             const imgUrl = pages[key].imageinfo?.[0]?.url;
             const lowerUrl = imgUrl?.toLowerCase() || "";
-            
-            if (imgUrl && !lowerUrl.includes('.svg') && !lowerUrl.includes('map') && !lowerUrl.includes('flag') && !lowerUrl.includes('logo')) {
+
+            if (imgUrl && !lowerUrl.includes('.svg') && !lowerUrl.includes('map') && !lowerUrl.includes('flag') && !lowerUrl.includes('logo') && !lowerUrl.includes('icon')) {
                 urls.push(imgUrl);
                 if (urls.length === 2) break;
             }
@@ -435,7 +447,8 @@ function renderList(rankedCountries) {
                 <div class="card-header">
                     <h2 style="margin: 0;">
                         <span class="rank-number">#${c.original_rank}</span> 
-                        <span class="country-name" data-name="${c.country}">${c.country}</span>${overtourismBadge}
+                        <!-- ADDED data-iso HERE -->
+                        <span class="country-name" data-name="${c.country}" data-iso="${c.iso_code}">${c.country}</span>${overtourismBadge}
                         <span class="status-indicator ${statusClass}">${statusText}</span>
                         ${advisoryToast}
                     </h2>
@@ -529,10 +542,15 @@ function renderList(rankedCountries) {
                 
                 if (imgContainer && !imgContainer.dataset.loaded) {
                     imgContainer.dataset.loaded = "true";
-                    imgContainer.innerHTML = '<span style="font-size: 12px; color: #7f8c8d; padding: 10px 0;">Loading landscape photos...</span>';
+                    imgContainer.innerHTML = '<span style="font-size: 12px; color: #7f8c8d; padding: 10px 0;">Loading capital photos...</span>';
                     
-                    const countryName = this.querySelector('.country-name').getAttribute('data-name');
-                    const images = await fetchCountryImages(countryName);
+                    // GRAB BOTH PIECES OF DATA NOW
+                    const nameEl = this.querySelector('.country-name');
+                    const countryName = nameEl.getAttribute('data-name');
+                    const isoCode = nameEl.getAttribute('data-iso');
+                    
+                    // PASS BOTH TO THE FETCH FUNCTION
+                    const images = await fetchCountryImages(countryName, isoCode);
                     
                     if (images.length > 0) {
                         const imgElements = images.map(url => `<img src="${url}" style="width: calc(50% - 5px); height: 200px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">`).join('');
