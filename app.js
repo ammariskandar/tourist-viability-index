@@ -17,7 +17,7 @@ const EUROCENTRIC_NATIONS = [
     'MC','SM', 'LI','MH','KN','MT','AD','VC','BB','AG'
 ];
 
-const UNESCO_TOP_10 = ['IT', 'CN', 'DE', 'ES', 'FR', 'IN', 'MX', 'GB', 'RU', 'IR'];
+const UNESCO_TOP_15 = ['IT', 'CN', 'DE', 'ES', 'FR', 'IN', 'MX', 'GB', 'RU', 'IR', 'US','JP','BR','CA','TR'];
 const UNESCO_MIN_6 = ['IT', 'CN', 'DE', 'FR', 'ES', 'IN', 'MX', 'GB', 'RU', 'IR', 'US', 'JP', 'BR', 'CA', 'TR', 'AU', 'GR', 'PL', 'CZ', 'PT', 'KR', 'BE', 'SE', 'PE', 'NL', 'CH', 'ET', 'ZA', 'AR', 'AT', 'RO', 'DK', 'ID', 'BG', 'HR', 'CO', 'MA', 'TN', 'CU', 'IL', 'VN', 'TH', 'KE', 'UA', 'SA', 'LK', 'HU', 'SK', 'EG', 'TZ', 'DZ', 'UZ', 'CL', 'SN', 'BO', 'JO', 'FI', 'PK', 'PH', 'IQ', 'SY', 'KZ', 'LB', 'MN'];
 
 const NATURE_TOP_8 = ['GR', 'IT', 'CH', 'ES', 'NZ', 'TH', 'No', 'IS',];
@@ -170,9 +170,9 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
     let unescoCombinedColor = "color: #7f8c8d;"; 
 
     
-    if (UNESCO_TOP_10.includes(country.iso_code)) { 
+    if (UNESCO_TOP_15.includes(country.iso_code)) { 
         totalScore += 5;
-        unescoCombinedStatus = "Top 10 Globally (+5)";
+        unescoCombinedStatus = "Top 15 Globally (+5)";
         unescoCombinedColor = "color: #27ae60;"
     } 
     // 2. Otherwise, check for the Penalty
@@ -214,17 +214,17 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
     let holySiteStatus = "None";
     
     if (HOLY_SITE_MUSLIM.includes(country.iso_code)) {
-        totalScore += 15;
-        holySiteStatus = "Muslim Pilgrimage Holy Site (+15)";
+        totalScore += 10;
+        holySiteStatus = "Muslim Pilgrimage Holy Site (+10)";
     } else if (HOLY_SITE_ABRAHAMIC.includes(country.iso_code)) {
-        totalScore += 15;
-        holySiteStatus = "Abrahamic Holy Site (Jerusalem) (+15)";
+        totalScore += 10;
+        holySiteStatus = "Abrahamic Holy Site (Jerusalem) (+10)";
     } else if (HOLY_SITE_CATHOLIC.includes(country.iso_code)) {
-        totalScore += 15;
-        holySiteStatus = "Catholic Holy Site (+15)";
+        totalScore += 10;
+        holySiteStatus = "Catholic Holy Site (+10)";
     } else if (HOLY_SITE_ORTHODOX.includes(country.iso_code)) {
-        totalScore += 15;
-        holySiteStatus = "Orthodox Holy Site (+15)";
+        totalScore += 10;
+        holySiteStatus = "Orthodox Holy Site (+10)";
     }
     
 
