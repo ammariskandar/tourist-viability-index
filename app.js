@@ -68,8 +68,8 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
     // --- NEW: Microstate Penalty ---
     let microstatePenaltyText = '';
     if (MICROSTATES.includes(country.iso_code)) {
-        totalScore -= 1.5;
-        microstatePenaltyText = '*Microstate penalty applied (-1.5)';
+        totalScore -= 2.77;
+        microstatePenaltyText = '*Microstate score penalty applied (-2.77)';
     }
 
     // Smartraveller API Penalty
