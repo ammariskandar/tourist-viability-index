@@ -64,14 +64,14 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
     }
 
     // Default to neutral 2.5/5 if data is missing
-    let cpiScore = 2.50; 
-    let displayCpi = "Data Missing";
+    let cliScore = 2.50; 
+    let displayCli = "Data Missing";
     
-    if (raw.cpi !== null && raw.cpi !== undefined) {
-        // Assuming a Cost of Living Index where ~120 is highly expensive and ~30 is dirt cheap
-        cpiScore = ((120 - raw.cpi) / (120 - 30)) * 5;
-        cpiScore = Math.max(0, Math.min(5, cpiScore)); // Clamp strictly between 0 and 5
-        displayCpi = raw.cpi;
+    if (raw.cli !== null && raw.cli !== undefined) {
+        // Assuming a Cost of Living Index where ~100 is highly expensive and ~30 is dirt cheap
+        cliScore = ((100 - raw.cli) / (100 - 30)) * 5;
+        cliScore = Math.max(0, Math.min(5, cliScore)); // Clamp strictly between 0 and 5
+        displayCli = raw.cli;
     }
 
     // Final Base Calculation
@@ -82,7 +82,7 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         (aqiScore * WEIGHTS.aqi) +
         (homicideScore * finalHomicideWeight) +
         (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35 * 2.5) +
-        gdpScore + cpiScore;
+        gdpScore + cliScore;
 
     // Isolation / Diplomacy Penalty
     let isolationPenaltyText = '';
@@ -141,8 +141,8 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         advisoryWarning: advisoryWarning,
         displayGdp: displayGdp,
         gdpScore: gdpScore,
-        displayCpi: displayCpi,
-        cpiScore: cpiScore
+        displayCli: displayCli,
+        cliScore: cliScore
     };
 }
 
@@ -249,7 +249,7 @@ function renderList(rankedCountries) {
                         </div>
                         <div class="stat-box">
                             <span class="stat-label">Cost of Living (0-5, 5 is cheaper)</span>
-                            <span class="stat-value">${c.displayCpi !== 'Data Missing' ? `${c.displayCpi} (+${c.cpiScore.toFixed(2)})` : 'Data Unavailable'}</span>
+                            <span class="stat-value">${c.displayCli !== 'Data Missing' ? `${c.displayCli} (+${c.cliScore.toFixed(2)})` : 'Data Unavailable'}</span>
                         </div>
                     </div>
                     <!-- Penalties sit cleanly below the grid -->
@@ -317,8 +317,8 @@ async function init() {
                 advisoryPageUrl: countryAdvisory ? countryAdvisory.pageUrl : null,
                 displayGdp: calc.displayGdp,
                 gdpScore: calc.gdpScore,
-                displayCpi: calc.displayCpi,
-                cpiScore: calc.cpiScore
+                displayCli: calc.displayCli,
+                cliScore: calc.cliScore
             });
         }
 
