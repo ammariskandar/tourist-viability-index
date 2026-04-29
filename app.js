@@ -27,7 +27,7 @@ const NATURE_TOP_3 = ['CN', 'AU', 'BR'];
 
 // --- Travel Persona Metrics ---
 const MUSLIM_MAJORITY = ['MV', 'MR', 'IR', 'SO', 'AF', 'DJ', 'EH', 'DZ', 'MA', 'KM', 'NE', 'TJ', 'TN', 'PS', 'AZ', 'JO', 'SN', 'YE', 'LY', 'YT', 'PK', 'GM', 'ML', 'SA', 'SD', 'IQ', 'TM', 'XK', 'TR', 'BD', 'EG', 'GN', 'UZ', 'ID', 'SY', 'OM', 'BN', 'KG', 'SL', 'QA', 'KW', 'BH', 'AE', 'KZ', 'LB', 'BF', 'MY', 'TD', 'ER', 'AL', 'BA'];
-const MUSLIM_FRIENDLY = ['NG', 'ET', 'TZ', 'RU', 'CN', 'CD', 'CI', 'CM', 'GH', 'MZ', 'TH', 'DE'];
+const MUSLIM_FRIENDLY = ['NG', 'ET', 'TZ', 'RU', 'CN', 'CD', 'CI', 'CM', 'GH', 'MZ', 'TH', 'DE','AU','NZ','TW','SG','JP'];
 const MUSLIM_HOSTILE = ['FR', 'IN', 'US', 'IL', 'GB'];
 
 // --- 2. THE MATH ENGINE ---
