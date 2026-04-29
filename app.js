@@ -68,21 +68,21 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
     let displayCli = "Data Missing";
     
     if (raw.cli !== null && raw.cli !== undefined) {
-        // Assuming a Cost of Living Index where ~100 is highly expensive and ~30 is dirt cheap
-        cliScore = ((100 - raw.cli) / (100 - 30)) * 5;
-        cliScore = Math.max(0, Math.min(5, cliScore)); // Clamp strictly between 0 and 5
+        // Assuming a Cost of Living Index where ~80 is highly expensive and ~10 is dirt cheap
+        cliScore = ((80 - raw.cli) / (80 - 10)) * 10;
+        cliScore = Math.max(0, Math.min(10, cliScore)); // Clamp strictly between 0 and 10
         displayCli = raw.cli;
     }
 
     // Final Base Calculation
     let totalScore = 
-        (gpiScore * WEIGHTS.gpi) +
+        ((gpiScore * WEIGHTS.gpi) +
         (gtiScore * WEIGHTS.gti) +
         (diplomacyScore * WEIGHTS.diplomacy) +
         (aqiScore * WEIGHTS.aqi) +
         (homicideScore * finalHomicideWeight) +
-        (femicideScore * finalFemicideWeight) - ((raw.rape_rate)/35 * 2.5) +
-        gdpScore + cliScore;
+        (femicideScore * finalFemicideWeight))*0.80 +
+        gdpScore + cliScore- ((raw.rape_rate)/35 * 2.5) ;
 
     // Isolation / Diplomacy Penalty
     let isolationPenaltyText = '';
@@ -101,8 +101,8 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
     // --- NEW: Microstate Penalty ---
     let microstatePenaltyText = '';
     if (MICROSTATES.includes(country.iso_code)) {
-        totalScore -= 2.77;
-        microstatePenaltyText = '*Microstate score penalty applied (-2.77)';
+        totalScore -= 7.77;
+        microstatePenaltyText = '*Microstate score penalty applied (-7.77)';
     }
 
     // --- NEW: Eurocentric Reporting Adjustment ---
@@ -244,11 +244,11 @@ function renderList(rankedCountries) {
                             <span class="stat-value">${c.scores_raw.rape_rate}</span>
                         </div>
                         <div class="stat-box">
-                            <span class="stat-label">GDP (Logarithmic 0-10)</span>
+                            <span class="stat-label">GDP Score (0-10, 10 is Highly Developed)</span>
                             <span class="stat-value">${c.displayGdp !== 'Data Missing' ? `${c.displayGdp} (+${c.gdpScore.toFixed(2)})` : 'Data Unavailable'}</span>
                         </div>
                         <div class="stat-box">
-                            <span class="stat-label">Cost of Living (0-5, 5 is cheaper)</span>
+                            <span class="stat-label">Cost of Living (0-10, 10 is cheaper)</span>
                             <span class="stat-value">${c.displayCli !== 'Data Missing' ? `${c.displayCli} (+${c.cliScore.toFixed(2)})` : 'Data Unavailable'}</span>
                         </div>
                     </div>
