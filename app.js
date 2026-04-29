@@ -227,8 +227,8 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         censorshipStatus = "Yes, absolute (-30)";
         censorshipColor = "color: #c0392b; font-weight: bold;"; // Red and bold
     } else if (CENSORSHIP_HIGH.includes(country.iso_code)) {
-        totalScore -= 15;
-        censorshipStatus = "Yes, high (-15)";
+        totalScore -= 5;
+        censorshipStatus = "Yes, high (-5)";
         censorshipColor = "color: #e67e22;"; // Orange
     }
 
