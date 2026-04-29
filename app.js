@@ -9,7 +9,7 @@ const WEIGHTS = {
 };
 
 // ISO Codes for recognized microstates (< 1000 sq km or population < 100k)
-const MICROSTATES = ['VA', 'MC', 'NR', 'TV', 'SM', 'LI', 'MH', 'KN', 'MV', 'MT', 'AD', 'PW', 'FM', 'VC', 'BB', 'AG', 'SC'];
+const MICROSTATES = ['VA', 'MC', 'NR', 'TV', 'SM', 'LI', 'MH', 'KN', 'MV', 'MT', 'AD', 'PW', 'FM', 'VC', 'BB', 'AG', 'SC' ,'BN','SG'];
 
 // --- 2. THE MATH ENGINE ---
 function calculateFinalScore(country, liveAqi, advisoryData) {
@@ -176,10 +176,34 @@ function renderList(rankedCountries) {
                     <div class="score">${displayScore}</div>
                 </div>
                 <div class="details">
-                    General Risk (Higher is Worse): ${c.scores_raw.gpi} | Geopolitical Situation Risk (Higher is Worse): ${c.scores_raw.gti} | Diplomacy Score (Higher is better): ${c.scores_raw.passport_vfs} | Homicides per 100K (Higher is worse): ${c.scores_raw.homicide_rate} | Sexual Crime Risk (Higher is worse) (Global Average is 40): ${c.scores_raw.rape_rate} 
-                    ${femicideText}
-                    ${isolationText}
-                    ${microText}
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-label">General Risk (Higher is Worse)</span>
+                            <span class="stat-value">${c.scores_raw.gpi}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Geopolitical Situation Risk (Higher is Worse)</span>
+                            <span class="stat-value">${c.scores_raw.gti}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Diplomacy Score (Higher is better)</span>
+                            <span class="stat-value">${c.scores_raw.passport_vfs}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Homicides per 100K (Higher is worse)</span>
+                            <span class="stat-value">${c.scores_raw.homicide_rate}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Sexual Crime Risk (Higher is worse) (Global Average is 40)</span>
+                            <span class="stat-value">${c.scores_raw.rape_rate}</span>
+                        </div>
+                    </div>
+                    <!-- Penalties sit cleanly below the grid -->
+                    <div>
+                        ${femicideText}
+                        ${isolationText}
+                        ${microText}
+                    </div>
                 </div>
             </div>
         `;

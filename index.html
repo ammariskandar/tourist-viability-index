@@ -142,6 +142,32 @@
             opacity: 0.8;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        
+        /* --- Stats Grid --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .stat-box {
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .stat-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
 
         /* --- Mobile Responsiveness --- */
         @media (max-width: 700px) {
