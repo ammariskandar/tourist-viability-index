@@ -1,10 +1,10 @@
-The Holistic Global Livability & Safety Index
-A comprehensive, real-time, data-driven ranking engine evaluating global safety, livability, and accessibility.
+The Holistic Global Travellability Index
+A comprehensive, real-time, data-driven ranking engine evaluating global safety, and accessibility to determine travellability.
 
 While traditional indices often rely on single-axis metrics (e.g., only economics or only crime rates), this application aggregates overlapping realities—ranging from physical safety and geopolitical stability to diplomatic mobility, economic viability, and inclusivity. Furthermore, the engine automatically corrects for institutional reporting biases and statistical anomalies to present a truly balanced, globally representative model.
 
 📊 Live Application
-(Insert Link to GitHub Pages / Live Demo Here)
+https://ammariskandar.github.io/tourist-viability-index/
 
 ⚙️ The Core Methodology
 The index calculates a baseline score using four primary datasets, normalized and weighted to create a mathematically sound baseline of physical and geopolitical security.
