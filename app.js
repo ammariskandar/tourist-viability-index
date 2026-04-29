@@ -96,8 +96,8 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
             (gtiScore * WEIGHTS.gti) +
             (diplomacyScore * WEIGHTS.diplomacy) +
             (aqiScore * WEIGHTS.aqi) +
-            (homicideScore * finalHomicideWeight*1.15) +
-            (femicideScore * finalFemicideWeight*1.35)) * 0.95 +
+            (homicideScore * finalHomicideWeight*1.25) +
+            (femicideScore * finalFemicideWeight*1.25)) * 0.95 +
             (gdpScore * 0.25) + (cliScore * 0.25) - ((raw.rape_rate) / 35 * 5);
     } else {
         totalScore = 
@@ -141,13 +141,27 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
 
     if (advisoryData) {
         if (advisoryData.level >= 4) {
-            totalScore -= 50; 
-            advisoryLevel = advisoryData.level;
-            advisoryWarning = advisoryData.advice;
+            if (isSoloMode) {
+                totalScore -= 100; 
+                advisoryLevel = advisoryData.level;
+                advisoryWarning = advisoryData.advice;
+            }
+            else{
+                totalScore -= 50; 
+                advisoryLevel = advisoryData.level;
+                advisoryWarning = advisoryData.advice;
+            }
         } else if (advisoryData.level === 3) {
-            totalScore -= 10; 
-            advisoryLevel = advisoryData.level;
-            advisoryWarning = advisoryData.advice;
+            if (isSoloMode) {
+                totalScore -= 40; 
+                advisoryLevel = advisoryData.level;
+                advisoryWarning = advisoryData.advice;
+            }
+            else{
+                totalScore -= 10; 
+                advisoryLevel = advisoryData.level;
+                advisoryWarning = advisoryData.advice;
+            }
         }
     }
 
@@ -330,7 +344,7 @@ function renderList(rankedCountries) {
         let statusText = '';
         let statusClass = '';
         
-        if (c.final_score >= 76) {
+        if (c.final_score >= 80) {
             statusText = '(Highly Recommended)';
             statusClass = 'status-highly-recommended';
         } else if (c.final_score >= 60) {
