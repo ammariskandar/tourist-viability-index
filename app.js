@@ -19,6 +19,12 @@ const EUROCENTRIC_NATIONS = [
     'MC','SM', 'LI','MH','KN','MT','AD','VC','BB','AG'
 ];
 
+// Top 10 UNESCO World Heritage Sites
+const UNESCO_TOP_10 = ['IT', 'CN', 'DE', 'ES', 'FR', 'IN', 'MX', 'GB', 'RU', 'IR'];
+
+// Top 3 Most Beautiful Nature Landscapes (CEOWORLD/SEAsia Survey)
+const NATURE_TOP_3 = ['CN', 'AU', 'BR'];
+
 // --- 2. THE MATH ENGINE ---
 function calculateFinalScore(country, liveAqi, advisoryData) {
     const raw = country.scores_raw;
@@ -129,6 +135,19 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         }
     }
 
+    // --- NEW: Positive Culture & Nature Bonuses ---
+    let isUnescoTop10 = "No";
+    if (UNESCO_TOP_10.includes(country.iso_code)) {
+        totalScore += 5;
+        isUnescoTop10 = "Yes (+5 Score)";
+    }
+
+    let isNatureTop3 = "No";
+    if (NATURE_TOP_3.includes(country.iso_code)) {
+        totalScore += 10;
+        isNatureTop3 = "Yes (+10 Score)";
+    }
+
     totalScore = Math.max(0, totalScore);
 
     return {
@@ -142,7 +161,9 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         displayGdp: displayGdp,
         gdpScore: gdpScore,
         displayCli: displayCli,
-        cliScore: cliScore
+        cliScore: cliScore,
+        isUnescoTop10: isUnescoTop10, 
+        isNatureTop3: isNatureTop3  
     };
 }
 
@@ -251,6 +272,14 @@ function renderList(rankedCountries) {
                             <span class="stat-label">Cost of Living (0-10, 10 is cheaper)</span>
                             <span class="stat-value">${c.displayCli !== 'Data Missing' ? `${c.displayCli} (+${c.cliScore.toFixed(2)})` : 'Data Unavailable'}</span>
                         </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Top 10 UNESCO Heritage Sites?</span>
+                            <span class="stat-value" style="${c.isUnescoTop10.startsWith('Yes') ? 'color: #27ae60;' : ''}">${c.isUnescoTop10}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Top 3 Most Beautiful Nature Landscapes?</span>
+                            <span class="stat-value" style="${c.isNatureTop3.startsWith('Yes') ? 'color: #27ae60;' : ''}">${c.isNatureTop3}</span>
+                        </div>
                     </div>
                     <!-- Penalties sit cleanly below the grid -->
                     <div style="margin-top: 10px;">
@@ -319,7 +348,9 @@ async function init() {
                 displayGdp: calc.displayGdp,
                 gdpScore: calc.gdpScore,
                 displayCli: calc.displayCli,
-                cliScore: calc.cliScore
+                cliScore: calc.cliScore,
+                isUnescoTop10: calc.isUnescoTop10,
+                isNatureTop3: calc.isNatureTop3 
             });
         }
 
