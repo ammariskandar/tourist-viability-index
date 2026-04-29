@@ -143,6 +143,8 @@ function renderList(rankedCountries) {
         const femicideText = c.penaltyApplied ? `<br><span class="penalty-flag">*Femicide data missing, homicide penalty applied (1.7x)</span>` : '';
         const isolationText = c.isolationPenaltyText ? `<br><span class="penalty-flag">${c.isolationPenaltyText}</span>` : '';
         const microText = c.microstatePenaltyText ? `<br><span class="penalty-flag">${c.microstatePenaltyText}</span>` : '';
+        const microText = c.microstatePenaltyText ? `<br><span class="penalty-flag">${c.microstatePenaltyText}</span>` : '';
+        const euroText = c.eurocentricPenaltyText ? `<br><span class="penalty-flag">${c.eurocentricPenaltyText}</span>` : '';
         
         let statusText = '';
         let statusClass = '';
@@ -215,10 +217,11 @@ function renderList(rankedCountries) {
                         </div>
                     </div>
                     <!-- Penalties sit cleanly below the grid -->
-                    <div>
+                    <div style="margin-top: 10px;">
                         ${femicideText}
                         ${isolationText}
                         ${microText}
+                        ${euroText}
                     </div>
                 </div>
             </div>
