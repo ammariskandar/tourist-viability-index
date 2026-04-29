@@ -198,10 +198,10 @@ function renderList(rankedCountries) {
         let statusText = '';
         let statusClass = '';
         
-        if (c.final_score >= 77) {
+        if (c.final_score >= 76) {
             statusText = '(Highly Recommended)';
             statusClass = 'status-highly-recommended';
-        } else if (c.final_score >= 65) {
+        } else if (c.final_score >= 60) {
             statusText = '(Okay to Visit)';
             statusClass = 'status-okay';
         } else if (c.final_score >= 50) {
