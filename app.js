@@ -8,6 +8,9 @@ const WEIGHTS = {
     aqi: 0.01
 };
 
+// ISO Codes for recognized microstates (< 1000 sq km or population < 100k)
+const MICROSTATES = ['VA', 'MC', 'NR', 'TV', 'SM', 'LI', 'MH', 'KN', 'MV', 'MT', 'AD', 'PW', 'FM', 'VC', 'BB', 'AG', 'SC'];
+
 // --- 2. THE MATH ENGINE ---
 function calculateFinalScore(country, liveAqi, advisoryData) {
     const raw = country.scores_raw;
@@ -62,17 +65,24 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         isolationPenaltyText = '*Moderate inaccesibility penalty applied (-5)';
     }
 
-    // --- NEW: Smartraveller API Penalty ---
+    // --- NEW: Microstate Penalty ---
+    let microstatePenaltyText = '';
+    if (MICROSTATES.includes(country.iso_code)) {
+        totalScore -= 1.5;
+        microstatePenaltyText = '*Microstate penalty applied (-1.5)';
+    }
+
+    // Smartraveller API Penalty
     let advisoryLevel = null;
     let advisoryWarning = null;
 
     if (advisoryData) {
         if (advisoryData.level >= 4) {
-            totalScore -= 50; // -50 penalty for Level 4+
+            totalScore -= 50; 
             advisoryLevel = advisoryData.level;
             advisoryWarning = advisoryData.advice;
         } else if (advisoryData.level === 3) {
-            totalScore -= 10; // -10 penalty for Level 3
+            totalScore -= 10; 
             advisoryLevel = advisoryData.level;
             advisoryWarning = advisoryData.advice;
         }
@@ -82,9 +92,10 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
     totalScore = Math.max(0, totalScore);
 
     return {
-        score: totalScore.toFixed(2),
+        score: totalScore, // Keep as raw number for sorting, do not use .toFixed() here yet
         penaltyApplied: penaltyApplied,
         isolationPenaltyText: isolationPenaltyText,
+        microstatePenaltyText: microstatePenaltyText,
         advisoryLevel: advisoryLevel,
         advisoryWarning: advisoryWarning
     };
@@ -115,6 +126,7 @@ function renderList(rankedCountries) {
     rankedCountries.forEach((c) => {
         const femicideText = c.penaltyApplied ? `<br><span class="penalty-flag">*Femicide data missing, homicide penalty applied (1.7x)</span>` : '';
         const isolationText = c.isolationPenaltyText ? `<br><span class="penalty-flag">${c.isolationPenaltyText}</span>` : '';
+        const microText = c.microstatePenaltyText ? `<br><span class="penalty-flag">${c.microstatePenaltyText}</span>` : '';
         
         let statusText = '';
         let statusClass = '';
@@ -137,12 +149,20 @@ function renderList(rankedCountries) {
             statusText += ' #FreePalestine';
         }
         
-        // --- NEW: Advisory Toast HTML ---
         let advisoryToast = '';
         if (c.advisoryLevel && c.advisoryLevel >= 3) {
             const toastClass = c.advisoryLevel >= 4 ? 'advisory-level-4' : 'advisory-level-3';
-            advisoryToast = `<span class="advisory-toast ${toastClass}">⚠️ Level ${c.advisoryLevel}: ${c.advisoryWarning}</span>`;
+            const toastBody = `<span class="advisory-toast ${toastClass}">⚠️ Level ${c.advisoryLevel}: ${c.advisoryWarning}</span>`;
+            
+            if (c.advisoryPageUrl) {
+                advisoryToast = `<a href="${c.advisoryPageUrl}" target="_blank" style="text-decoration: none;" onclick="event.stopPropagation();">${toastBody}</a>`;
+            } else {
+                advisoryToast = toastBody;
+            }
         }
+
+        // Apply .toFixed(2) exclusively on rendering
+        const displayScore = c.final_score.toFixed(2);
 
         html += `
             <div class="country-card">
@@ -153,12 +173,13 @@ function renderList(rankedCountries) {
                         <span class="status-indicator ${statusClass}">${statusText}</span>
                         ${advisoryToast}
                     </h2>
-                    <div class="score">${c.final_score}</div>
+                    <div class="score">${displayScore}</div>
                 </div>
                 <div class="details">
                     General Risk (Higher is Worse): ${c.scores_raw.gpi} | Geopolitical Situation Risk (Higher is Worse): ${c.scores_raw.gti} | Diplomacy Score (Higher is better): ${c.scores_raw.passport_vfs} | Homicides per 100K (Higher is worse): ${c.scores_raw.homicide_rate} | Sexual Crime Risk (Higher is worse) (Global Average is 40): ${c.scores_raw.rape_rate} 
                     ${femicideText}
                     ${isolationText}
+                    ${microText}
                 </div>
             </div>
         `;
@@ -180,16 +201,13 @@ async function init() {
     try {
         const staticData = await fetchStaticData();
         
-        // --- NEW: Fetch Advisories Safely ---
         let advisories = {};
         try {
-            // We fetch the 'advisories' list which contains all countries to save API calls
             const advResponse = await fetch('https://smartraveller.kevle.xyz/api/advisories');
             if (advResponse.ok) {
                 const advData = await advResponse.json();
                 if (advData && advData.advisories) {
                     advData.advisories.forEach(item => {
-                        // Map the advisory to the 2-letter ISO code
                         if (item.country && item.country.alpha2) {
                             advisories[item.country.alpha2] = item;
                         }
@@ -205,25 +223,26 @@ async function init() {
         // Process each country
         for (const country of staticData) {
             const liveAqi = await fetchLiveAQI(country.iso_code);
-            const countryAdvisory = advisories[country.iso_code]; // Look up the specific country
+            const countryAdvisory = advisories[country.iso_code]; 
             
-            // Pass the advisory data into the math engine
             const calc = calculateFinalScore(country, liveAqi, countryAdvisory);
             
             processedData.push({
                 ...country,
-                final_score: parseFloat(calc.score),
+                final_score: calc.score, // Stored as a strict Number type for accurate sorting
                 penaltyApplied: calc.penaltyApplied,
                 isolationPenaltyText: calc.isolationPenaltyText,
+                microstatePenaltyText: calc.microstatePenaltyText,
                 advisoryLevel: calc.advisoryLevel,
-                advisoryWarning: calc.advisoryWarning
+                advisoryWarning: calc.advisoryWarning,
+                advisoryPageUrl: countryAdvisory ? countryAdvisory.pageUrl : null 
             });
         }
 
         // Sort Highest to Lowest
         processedData.sort((a, b) => b.final_score - a.final_score);
 
-        // Stamp the true rank so it doesn't change when filtering
+        // Stamp the true rank
         processedData.forEach((c, i) => {
             c.original_rank = i + 1;
         });
@@ -232,7 +251,6 @@ async function init() {
 
         renderList(allCountriesData);
 
-        // Reveal the search bar and attach the listener
         const searchInput = document.getElementById('searchInput');
         searchInput.style.display = 'block';
         
