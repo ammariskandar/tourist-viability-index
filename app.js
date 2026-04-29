@@ -1,4 +1,5 @@
 let allCountriesData = []; // Holds the master dataset for searching
+let rawCountriesData = []; // Holds the raw fetched data for instant recalculation
 
 // --- 1. CONFIGURATION & WEIGHTS ---
 const WEIGHTS = {
@@ -52,7 +53,7 @@ const IATA_81_100 = ['MT', 'SV', 'AZ', 'GE', 'AL', 'BS', 'NG', 'EC', 'CU', 'GT',
 const MICHELIN_TOP_10 = ['FR', 'AE', 'IT', 'JP', 'DE', 'ES', 'US', 'GB', 'CH', 'CN'];
 
 // --- 2. THE MATH ENGINE ---
-function calculateFinalScore(country, liveAqi, advisoryData) {
+function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false) {
     const raw = country.scores_raw;
     
     // Normalizations
@@ -107,14 +108,28 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
     }
 
     // Final Base Calculation
-    let totalScore = 
-        ((gpiScore * WEIGHTS.gpi) +
-        (gtiScore * WEIGHTS.gti) +
-        (diplomacyScore * WEIGHTS.diplomacy) +
-        (aqiScore * WEIGHTS.aqi) +
-        (homicideScore * finalHomicideWeight) +
-        (femicideScore * finalFemicideWeight))*0.80 +
-        gdpScore + cliScore- ((raw.rape_rate)/35 * 2.5) ;
+    // Final Base Calculation
+    let totalScore = 0;
+
+    if (isSoloMode) {
+        totalScore = 
+            ((gpiScore * WEIGHTS.gpi) +
+            (gtiScore * WEIGHTS.gti) +
+            (diplomacyScore * WEIGHTS.diplomacy) +
+            (aqiScore * WEIGHTS.aqi) +
+            (homicideScore * finalHomicideWeight) +
+            (femicideScore * finalFemicideWeight)) * 0.90 +
+            (gdpScore * 0.5) + (cliScore * 0.5) - ((raw.rape_rate) / 35 * 3);
+    } else {
+        totalScore = 
+            ((gpiScore * WEIGHTS.gpi) +
+            (gtiScore * WEIGHTS.gti) +
+            (diplomacyScore * WEIGHTS.diplomacy) +
+            (aqiScore * WEIGHTS.aqi) +
+            (homicideScore * finalHomicideWeight) +
+            (femicideScore * finalFemicideWeight)) * 0.80 +
+            gdpScore + cliScore - ((raw.rape_rate) / 35 * 2.5);
+    }
 
     // Isolation / Diplomacy Penalty
     let isolationPenaltyText = '';
@@ -559,5 +574,59 @@ async function init() {
         document.getElementById('loading').innerText = "Error loading data.";
     }
 }
+function processAndRenderData() {
+    const isSoloMode = document.getElementById('soloToggle').checked;
+    const processedData = [];
 
+    for (const item of rawCountriesData) {
+        const calc = calculateFinalScore(item.country, item.liveAqi, item.countryAdvisory, isSoloMode);
+        
+        processedData.push({
+            ...item.country,
+            final_score: calc.score,
+            penaltyApplied: calc.penaltyApplied,
+            isolationPenaltyText: calc.isolationPenaltyText,
+            microstatePenaltyText: calc.microstatePenaltyText,
+            eurocentricPenaltyText: calc.eurocentricPenaltyText,
+            advisoryLevel: calc.advisoryLevel,
+            advisoryWarning: calc.advisoryWarning,
+            advisoryPageUrl: item.countryAdvisory ? item.countryAdvisory.pageUrl : null,
+            displayGdp: calc.displayGdp,
+            gdpScore: calc.gdpScore,
+            displayCli: calc.displayCli,
+            cliScore: calc.cliScore,
+            isUnescoTop10: calc.isUnescoTop10,
+            isNatureTop3: calc.isNatureTop3,
+            muslimFriendlyStatus: calc.muslimFriendlyStatus,
+            muslimFriendlyColor: calc.muslimFriendlyColor,
+            holySiteStatus: calc.holySiteStatus,
+            overtourismStatus: calc.overtourismStatus,
+            overtourismColor: calc.overtourismColor,
+            censorshipStatus: calc.censorshipStatus,
+            censorshipColor: calc.censorshipColor,
+            connectivityStatus: calc.connectivityStatus,
+            connectivityColor: calc.connectivityColor,
+            michelinStatus: calc.michelinStatus,
+            michelinColor: calc.michelinColor
+        });
+    }
+
+    // Sort Highest to Lowest
+    processedData.sort((a, b) => b.final_score - a.final_score);
+
+    // Stamp the true rank
+    processedData.forEach((c, i) => {
+        c.original_rank = i + 1;
+    });
+
+    allCountriesData = processedData;
+
+    // Respect search input during re-render
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    if (searchTerm) {
+        renderList(allCountriesData.filter(c => c.country.toLowerCase().includes(searchTerm)));
+    } else {
+        renderList(allCountriesData);
+    }
+}
 init();

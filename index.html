@@ -218,7 +218,12 @@
         <h1>Recommended Countries for Travel</h1>
         <p class="subtitle">A comprehensive, data-driven index of global safety, livability, and accessibility. Base scores evaluate physical safety, geopolitical stability, severe crime risk, diplomatic mobility, and economic realities (GDP and Cost of Living). The model algorithmically corrects for institutional Eurocentric reporting bias and microstate statistical anomalies while applying strict penalties for active conflict zones, extreme isolation, and failing to report femicide data. Finally, the index rewards cultural and natural richness (UNESCO top sites, natural landscapes) and adjusts for inclusive travel accessibility (Muslim-friendly environments) to provide a truly holistic global ranking.</p>       
         <div id="loading">Loading data...</div>
-        <input type="text" id="searchInput" class="search-bar" placeholder="Search for a country..." style="display: none;">
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; justify-content: center;">
+            <input type="text" id="searchInput" placeholder="Search country..." style="display:none; padding: 8px; width: 300px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer;">
+                <input type="checkbox" id="soloToggle"> Solo Traveler Mode
+            </label>
+        </div>
         <div id="results-container"></div>
     </div>
 
