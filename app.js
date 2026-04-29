@@ -197,17 +197,17 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
     let holySiteStatus = "None";
     
     if (HOLY_SITE_MUSLIM.includes(country.iso_code)) {
-        totalScore += 25;
-        holySiteStatus = "Muslim Pilgrimage Holy Site (+25)";
+        totalScore += 15;
+        holySiteStatus = "Muslim Pilgrimage Holy Site (+15)";
     } else if (HOLY_SITE_ABRAHAMIC.includes(country.iso_code)) {
-        totalScore += 25;
-        holySiteStatus = "Abrahamic Holy Site (Jerusalem) (+25)";
+        totalScore += 15;
+        holySiteStatus = "Abrahamic Holy Site (Jerusalem) (+15)";
     } else if (HOLY_SITE_CATHOLIC.includes(country.iso_code)) {
-        totalScore += 25;
-        holySiteStatus = "Catholic Holy Site (+25)";
+        totalScore += 15;
+        holySiteStatus = "Catholic Holy Site (+15)";
     } else if (HOLY_SITE_ORTHODOX.includes(country.iso_code)) {
-        totalScore += 25;
-        holySiteStatus = "Orthodox Holy Site (+25)";
+        totalScore += 15;
+        holySiteStatus = "Orthodox Holy Site (+15)";
     }
     
 
