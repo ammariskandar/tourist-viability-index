@@ -11,6 +11,13 @@ const WEIGHTS = {
 // ISO Codes for recognized microstates (< 1000 sq km or population < 100k)
 const MICROSTATES = ['VA', 'MC', 'NR', 'TV', 'SM', 'LI', 'MH', 'KN', 'MV', 'MT', 'AD', 'PW', 'FM', 'VC', 'BB', 'AG', 'SC' ,'BN','SG'];
 
+// NATO members + Austria, Switzerland, Ireland
+const EUROCENTRIC_NATIONS = [
+    'AL', 'BE', 'BG', 'CA', 'HR', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 
+    'HU', 'IS', 'IT', 'LV', 'LT', 'LU', 'ME', 'MK', 'NL', 'NO', 'PL', 'PT', 
+    'RO', 'SK', 'SI', 'ES', 'SE', 'TR', 'GB', 'US', 'AT', 'CH', 'IE'
+];
+
 // --- 2. THE MATH ENGINE ---
 function calculateFinalScore(country, liveAqi, advisoryData) {
     const raw = country.scores_raw;
@@ -70,6 +77,15 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
     if (MICROSTATES.includes(country.iso_code)) {
         totalScore -= 2.77;
         microstatePenaltyText = '*Microstate score penalty applied (-2.77)';
+    }
+
+    // --- NEW: Eurocentric Reporting Adjustment ---
+    let eurocentricPenaltyText = '';
+    if (EUROCENTRIC_NATIONS.includes(country.iso_code)) {
+        // Calculate 5% of the current score and subtract it
+        const deduction = totalScore * 0.05;
+        totalScore -= deduction;
+        eurocentricPenaltyText = `*Eurocentric reporting adjustment applied (-5%)`;
     }
 
     // Smartraveller API Penalty
