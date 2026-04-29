@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tourist Viability Index</title>
     <style>
-        /* Minimalist aesthetics */
         body { 
             font-family: system-ui, -apple-system, sans-serif; 
             background: #f9f9f9; 
@@ -13,14 +12,10 @@
             margin: 0; 
             padding: 2rem; 
         }
-        
-        /* Fixed missing dot selector here */
         .max-width { 
             max-width: 1200px; 
             margin: 0 auto; 
         }
-
-        /* Subtitle styling */
         p.subtitle { 
             font-size: 0.7rem; 
             color: #7f8c8d; 
@@ -28,14 +23,12 @@
             margin-top: -10px; 
             margin-bottom: 1rem; 
         }
-
-        /* Accordion Structure */
         .country-card { 
             background: white; 
             padding: 1.5rem; 
             border-bottom: 1px solid #eee; 
             display: flex; 
-            flex-direction: column; /* Stack header and details vertically */
+            flex-direction: column;
         }
         
         .card-header { 
@@ -43,15 +36,13 @@
             justify-content: space-between; 
             align-items: center; 
             width: 100%; 
-            cursor: pointer; /* Show it is clickable */
+            cursor: pointer;
             user-select: none;
         }
         
         .card-header:hover h2 {
-            color: #3498db; /* Slight interaction feedback */
+            color: #3498db;
         }
-
-        /* Hidden details by default */
         .details { 
             font-size: 0.85rem; 
             color: #666; 
@@ -60,45 +51,30 @@
             border-top: 1px dashed #ddd; 
             display: none; 
         }
-        
-        /* Toggled by JS */
         .details.show { 
             display: block; 
         }
-
-        /* Status colors */
         .score { font-size: 1.5rem; font-weight: bold; color: #2c3e50; }
         .penalty-flag { color: #e74c3c; font-weight: bold; }
         .status-highly-recommended { color: #27ae60; font-weight: bold; }
         .status-okay { color: #f39c12; font-weight: bold; }
         .status-avoid { color: #e74c3c; font-weight: bold; }
         .status-danger { color: #900c3f; font-weight: bold; }
-
-        /* --- Desktop Status Indicator --- */
         .status-indicator {
             font-size: 1rem;
             margin-left: 10px;
-            display: inline; /* Keeps it on the same line */
+            display: inline;
         }
-
-        /* --- Mobile Responsiveness --- */
         @media (max-width: 600px) {
-            /* 1. Hide the subheadings entirely */
             p.subtitle {
                 display: none; 
             }
-
-            /* 2. Reduce the massive space at the top and sides of the screen */
             body {
-                padding: 1rem 0.5rem; /* 1rem top/bottom, 0.5rem sides */
+                padding: 1rem 0.5rem;
             }
-
-            /* 3. Reduce the padding inside the cards so they stretch closer to the edge */
             .country-card {
                 padding: 1rem; 
             }
-
-            /* (Your existing mobile rules below) */
             .status-indicator {
                 display: block; 
                 font-size: 0.6rem; 
@@ -116,8 +92,6 @@
                 margin-right: 2px; 
             }
         }
-
-        /* --- Advisory Toast --- */
         .advisory-toast {
             font-size: 0.75rem;
             margin-left: 10px;
@@ -131,19 +105,17 @@
             vertical-align: middle;
         }
         .advisory-level-3 {
-            color: #e67e22; /* Orange for Level 3 */
+            color: #e67e22;
             border-color: #e67e22;
         }
         .advisory-level-4 {
-            color: #c0392b; /* Red for Level 4+ */
+            color: #c0392b; 
             border-color: #c0392b;
         }
         .advisory-toast:hover {
             opacity: 0.8;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
-        /* --- Stats Grid --- */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -168,25 +140,16 @@
             font-weight: bold;
             color: #2c3e50;
         }
-
-        /* --- Mobile Responsiveness --- */
         @media (max-width: 700px) {
-            /* 1. Hide the subheadings entirely */
             p.subtitle {
                 display: none; 
             }
-
-            /* 2. Reduce the massive space at the top and sides of the screen */
             body {
-                padding: 1rem 0.5rem; /* 1rem top/bottom, 0.5rem sides */
+                padding: 1rem 0.5rem;
             }
-
-            /* 3. Reduce the padding inside the cards so they stretch closer to the edge */
             .country-card {
                 padding: 1rem; 
             }
-
-            /* (Your existing mobile rules below) */
             .status-indicator {
                 display: block; 
                 font-size: 0.6rem; 
@@ -229,4 +192,14 @@
 
     <script src="app.js"></script>
 </body>
+    <footer style="text-align: center; padding: 20px; margin-top: 40px; font-size: 14px; color: #7f8c8d; border-top: 1px solid #eee;">
+        <div style="margin-bottom: 10px;">
+            <span style="vertical-align: middle; margin-right: 10px;">Total Explorers:</span>
+            <img src="https://profile-counter.glitch.me/ammar-travel-index-123/count.svg" alt="Visitor Count" style="vertical-align: middle;" />
+        </div>
+        <div>
+            Travel advisories powered by <a href="https://github.com/kevle1/smartraveller-api" target="_blank" style="color: #3498db; text-decoration: none;">Kevle's Smartraveller API</a>.
+        </div>
+        
+    </footer>
 </html>
