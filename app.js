@@ -486,7 +486,7 @@ function renderList(rankedCountries) {
 }
 
 // --- 5. INITIALIZATION ---
-f// ---------------------------------------------------------
+// ---------------------------------------------------------
 // 1. THE DATA PIPELINE (NO PLACEHOLDERS)
 // ---------------------------------------------------------
 function processAndRenderData() {
