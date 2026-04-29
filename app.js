@@ -30,6 +30,12 @@ const MUSLIM_MAJORITY = ['MV', 'MR', 'IR', 'SO', 'AF', 'DJ', 'EH', 'DZ', 'MA', '
 const MUSLIM_FRIENDLY = ['NG', 'ET', 'TZ', 'RU', 'CN', 'CD', 'CI', 'CM', 'GH', 'MZ', 'TH', 'DE','AU','NZ','TW','SG','JP'];
 const MUSLIM_HOSTILE = ['FR', 'IN', 'US', 'IL', 'GB'];
 
+// --- Major Religious Pilgrimage Sites ---
+const HOLY_SITE_MUSLIM = ['SA']; // Mecca & Medina
+const HOLY_SITE_ABRAHAMIC = ['IL', 'PS']; // Jerusalem (Muslim, Jewish, Christian)
+const HOLY_SITE_CATHOLIC = ['IT', 'VA']; // Rome & Vatican City
+const HOLY_SITE_ORTHODOX = ['RU', 'GR']; // Moscow & Mount Athos
+
 // --- 2. THE MATH ENGINE ---
 function calculateFinalScore(country, liveAqi, advisoryData) {
     const raw = country.scores_raw;
@@ -171,6 +177,23 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         muslimFriendlyColor = "color: #c0392b;"; // Red
     }
 
+    // --- NEW: Major Religious Pilgrimage Bonus ---
+    let holySiteStatus = "None";
+    
+    if (HOLY_SITE_MUSLIM.includes(country.iso_code)) {
+        totalScore += 25;
+        holySiteStatus = "Muslim Pilgrimage Holy Site (+25)";
+    } else if (HOLY_SITE_ABRAHAMIC.includes(country.iso_code)) {
+        totalScore += 25;
+        holySiteStatus = "Abrahamic Holy Site (Jerusalem) (+25)";
+    } else if (HOLY_SITE_CATHOLIC.includes(country.iso_code)) {
+        totalScore += 25;
+        holySiteStatus = "Catholic Holy Site (+25)";
+    } else if (HOLY_SITE_ORTHODOX.includes(country.iso_code)) {
+        totalScore += 25;
+        holySiteStatus = "Orthodox Holy Site (+25)";
+    }
+
     // Ensure the score doesn't drop below 0
     totalScore = Math.max(0, totalScore);
 
@@ -189,7 +212,8 @@ function calculateFinalScore(country, liveAqi, advisoryData) {
         isUnescoTop10: isUnescoTop10, 
         isNatureTop3: isNatureTop3,
         muslimFriendlyStatus: muslimFriendlyStatus,
-        muslimFriendlyColor: muslimFriendlyColor
+        muslimFriendlyColor: muslimFriendlyColor,
+        holySiteStatus: holySiteStatus
     };
 }
 
@@ -310,6 +334,10 @@ function renderList(rankedCountries) {
                             <span class="stat-label">Muslim-Friendly Travel?</span>
                             <span class="stat-value" style="${c.muslimFriendlyColor}">${c.muslimFriendlyStatus}</span>
                         </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Major Religious Pilgrimage Site?</span>
+                            <span class="stat-value" style="${c.holySiteStatus !== 'None' ? 'color: #8e44ad; font-weight: bold;' : ''}">${c.holySiteStatus}</span>
+                        </div>
                     </div>
                     <!-- Penalties sit cleanly below the grid -->
                     <div style="margin-top: 10px;">
@@ -382,7 +410,8 @@ async function init() {
                 isUnescoTop10: calc.isUnescoTop10,
                 isNatureTop3: calc.isNatureTop3,
                 muslimFriendlyStatus: calc.muslimFriendlyStatus,
-                muslimFriendlyColor: calc.muslimFriendlyColor 
+                muslimFriendlyColor: calc.muslimFriendlyColor,
+                holySiteStatus: calc.holySiteStatus
             });
         }
 
