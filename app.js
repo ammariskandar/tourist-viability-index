@@ -19,7 +19,7 @@ const EUROCENTRIC_NATIONS = [
 
 const UNESCO_TOP_10 = ['IT', 'CN', 'DE', 'ES', 'FR', 'IN', 'MX', 'GB', 'RU', 'IR'];
 
-const NATURE_TOP_5 = ['CN', 'AU', 'BR', 'JP', 'NZ'];
+const NATURE_TOP_8 = ['GR', 'IT', 'CH', 'ES', 'NZ', 'TH', 'No', 'IS',];
 
 const MUSLIM_MAJORITY = ['MV', 'MR', 'IR', 'SO', 'AF', 'DJ', 'EH', 'DZ', 'MA', 'KM', 'NE', 'TJ', 'TN', 'PS', 'AZ', 'JO', 'SN', 'YE', 'LY', 'YT', 'PK', 'GM', 'ML', 'SA', 'SD', 'IQ', 'TM', 'XK', 'TR', 'BD', 'EG', 'GN', 'UZ', 'ID', 'SY', 'OM', 'BN', 'KG', 'SL', 'QA', 'KW', 'BH', 'AE', 'KZ', 'LB', 'BF', 'MY', 'TD', 'ER', 'AL', 'BA'];
 const MUSLIM_FRIENDLY = ['NG', 'ET', 'TZ', 'RU', 'CN', 'CD', 'CI', 'CM', 'GH', 'MZ', 'TH', 'DE','AU','NZ','TW','SG','JP'];
@@ -131,9 +131,9 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
 
     let eurocentricPenaltyText = '';
     if (EUROCENTRIC_NATIONS.includes(country.iso_code)) {
-        const deduction = totalScore * 0.02;
+        const deduction = totalScore * 0.03;
         totalScore -= deduction;
-        eurocentricPenaltyText = `*Eurocentric reporting adjustment applied (-2%)`;
+        eurocentricPenaltyText = `*Eurocentric reporting adjustment applied (-3%)`;
     }
 
     let advisoryLevel = null;
@@ -171,10 +171,10 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         isUnescoTop10 = "Yes (+5 Score)";
     }
 
-    let isNatureTop5 = "No";
-    if (NATURE_TOP_5.includes(country.iso_code)) {
-        totalScore += 10;
-        isNatureTop5 = "Yes (+10 Score)";
+    let isNatureTop8 = "No";
+    if (NATURE_TOP_8.includes(country.iso_code)) {
+        totalScore += 8;
+        isNatureTop8 = "Yes (+8 Score)";
     }
 
     let muslimFriendlyStatus = "Neutral (0)";
@@ -304,7 +304,7 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         displayCli: displayCli,
         cliScore: cliScore,
         isUnescoTop10: isUnescoTop10, 
-        isNatureTop5: isNatureTop5,
+        isNatureTop8: isNatureTop8,
         muslimFriendlyStatus: muslimFriendlyStatus,
         muslimFriendlyColor: muslimFriendlyColor,
         holySiteStatus: holySiteStatus,
@@ -427,8 +427,8 @@ function renderList(rankedCountries) {
                             <span class="stat-value" style="${c.isUnescoTop10.startsWith('Yes') ? 'color: #27ae60;' : ''}">${c.isUnescoTop10}</span>
                         </div>
                         <div class="stat-box">
-                            <span class="stat-label">Top 5 Most Beautiful Nature Landscapes? (Popular Vote)</span>
-                            <span class="stat-value" style="${c.isNatureTop5.startsWith('Yes') ? 'color: #27ae60;' : ''}">${c.isNatureTop5}</span>
+                            <span class="stat-label">Top 8 Most Beautiful Nature Landscapes? (Popular Vote)</span>
+                            <span class="stat-value" style="${c.isNatureTop8.startsWith('Yes') ? 'color: #27ae60;' : ''}">${c.isNatureTop8}</span>
                         </div>
                         <div class="stat-box">
                             <span class="stat-label">Muslim-Friendly Travel?</span>
@@ -503,7 +503,7 @@ function processAndRenderData() {
             cliScore: calc.cliScore,
             
             isUnescoTop10: calc.isUnescoTop10,
-            isNatureTop5: calc.isNatureTop5,
+            isNatureTop8: calc.isNatureTop8,
             
             muslimFriendlyStatus: calc.muslimFriendlyStatus,
             muslimFriendlyColor: calc.muslimFriendlyColor,
