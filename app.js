@@ -92,13 +92,13 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
 
     if (isSoloMode) {
         totalScore = 
-            ((gpiScore * WEIGHTS.gpi*0.5) +
-            (gtiScore * WEIGHTS.gti) +
+            (((gpiScore * WEIGHTS.gpi*0.25) +
+            (gtiScore * WEIGHTS.gti*1.25) +
             (diplomacyScore * WEIGHTS.diplomacy) +
             (aqiScore * WEIGHTS.aqi) +
             (homicideScore * finalHomicideWeight*1.25) +
             (femicideScore * finalFemicideWeight*1.25)) * 0.95 +
-            (gdpScore * 0.25) + (cliScore * 0.25) - ((raw.rape_rate) / 35 * 5);
+            (gdpScore * 0.35) + (cliScore * 0.15) - ((raw.rape_rate) / 35 * 5)*1.15);
     } else {
         totalScore = 
             ((gpiScore * WEIGHTS.gpi) +
@@ -153,7 +153,7 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
             }
         } else if (advisoryData.level === 3) {
             if (isSoloMode) {
-                totalScore -= 40; 
+                totalScore -= 50; 
                 advisoryLevel = advisoryData.level;
                 advisoryWarning = advisoryData.advice;
             }
@@ -285,7 +285,11 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         michelinColor = "color: #27ae60;";
     }
 
-    totalScore = Math.max(0, totalScore);
+    if (isSoloMode) {
+        totalScore = Math.max(0, totalScore*0.80);
+    } else {
+        totalScore = Math.max(0, totalScore);
+    }
 
     return {
         score: totalScore, 
