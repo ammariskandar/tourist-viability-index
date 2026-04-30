@@ -353,6 +353,7 @@ async function fetchLiveAQI(isoCode) {
 
 
 
+
 // Store both your encoded keys here
 const PIXABAY_KEYS = {
     primary: 'NTU2NDcwMDctZWM4NjNmZTY0NzIwY2ZhN2UxODQ1MDFiMg==', 
@@ -371,28 +372,10 @@ async function fetchWithTimeout(url, timeoutMs = 4000) {
     return response;
 }
 
-// --- HELPER 2: The Wikipedia Fallback Engine ---
+// --- HELPER 2: The STRICT Wikipedia Fallback Engine ---
 async function fetchWikipediaFallback(isoCode, countryName) {
-    let searchTerm = countryName;
-    
-    // Step 1: Get the Capital
-    try {
-        const rcRes = await fetchWithTimeout(`https://restcountries.com/v3.1/alpha/${isoCode}`, 3000);
-        if (rcRes.ok) {
-            const rcData = await rcRes.json();
-            if (rcData[0] && rcData[0].capital && rcData[0].capital[0]) {
-                searchTerm = rcData[0].capital[0]; 
-            }
-        }
-    } catch (e) {
-        console.warn("RestCountries failed, defaulting to country name for Wikipedia.");
-    }
-
-    // Step 2: Query Wikipedia
-    async function fetchWikipediaFallback(isoCode, countryName) {
     let capitalName = null;
 
-    // Step 1: Get the Capital
     try {
         const rcRes = await fetchWithTimeout(`https://restcountries.com/v3.1/alpha/${isoCode}`, 3000);
         if (rcRes.ok) {
@@ -405,7 +388,6 @@ async function fetchWikipediaFallback(isoCode, countryName) {
         console.warn("RestCountries failed, will only use Country Name for Wikipedia.");
     }
 
-    // Step 2: The Ruthless Search & Filter Engine
     async function executeStrictWikiSearch(searchTerm) {
         const searchQuery = encodeURIComponent(searchTerm);
         const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${searchQuery}&gsrnamespace=6&gsrlimit=20&prop=imageinfo&iiprop=url&format=json&origin=*`;
@@ -433,26 +415,25 @@ async function fetchWikipediaFallback(isoCode, countryName) {
                     continue;
                 }
 
-                // FATAL FILTER 2: No maps, flags, or logos
+                // FATAL FILTER 2: No maps, flags, logos, or icons
                 if (lowerUrl.includes('map') || lowerUrl.includes('flag') || lowerUrl.includes('logo') || lowerUrl.includes('icon')) {
                     continue;
                 }
 
-                // Clean the title for comparison
+                // Clean title for comparison
                 let cleanTitle = title.replace(/^File:/i, '').replace(/\.[a-zA-Z0-9]+$/i, '').trim();
                 let lowerCleanTitle = cleanTitle.toLowerCase();
                 let lowerSearch = searchTerm.toLowerCase();
                 let wordCount = cleanTitle.split(/\s+/).length;
 
-                // FATAL FILTER 3: The title MUST contain the search term. (No more "Rank 3" catch-all)
+                // FATAL FILTER 3: Must strictly contain the name
                 if (lowerCleanTitle === lowerSearch) {
-                    validImages.push({ url: imgUrl, rank: 1, wordCount: wordCount }); // Exact match
+                    validImages.push({ url: imgUrl, rank: 1, wordCount: wordCount });
                 } else if (lowerCleanTitle.includes(lowerSearch)) {
-                    validImages.push({ url: imgUrl, rank: 2, wordCount: wordCount }); // Contains name
+                    validImages.push({ url: imgUrl, rank: 2, wordCount: wordCount });
                 }
             }
 
-            // Sort what survived by Rank, then by shortest title
             validImages.sort((a, b) => {
                 if (a.rank !== b.rank) return a.rank - b.rank; 
                 return a.wordCount - b.wordCount;              
@@ -464,21 +445,18 @@ async function fetchWikipediaFallback(isoCode, countryName) {
         }
     }
 
-    // Step 3: Try searching by Capital City first
     let urls = [];
     if (capitalName) {
         urls = await executeStrictWikiSearch(capitalName);
     }
 
-    // Step 4: If Capital City search failed or returned NO strict matches, fallback to Country Name
-    if (urls.length === 0) {
+    if (!urls || urls.length === 0) {
         console.log(`Strict search for capital failed. Trying country name: ${countryName}`);
         urls = await executeStrictWikiSearch(countryName);
     }
 
-    // Return the top 2 surviving URLs
-    return urls.slice(0, 2);
-    }
+    // Safety check: ensure we absolutely return an array
+    return Array.isArray(urls) ? urls.slice(0, 2) : [];
 }
 
 // --- MAIN FETCH FUNCTION ---
@@ -486,7 +464,6 @@ async function fetchCountryImages(countryName, isoCode) {
     const cacheKey = `pixabay_cache_${isoCode}`;
     const cachedData = localStorage.getItem(cacheKey);
 
-    // 1. Check 24-hour cache
     if (cachedData) {
         const parsedData = JSON.parse(cachedData);
         const ageInMilliseconds = Date.now() - parsedData.timestamp;
@@ -495,27 +472,25 @@ async function fetchCountryImages(countryName, isoCode) {
         }
     }
 
+    // Notice: "travel" keyword is permanently removed to prevent the Germany/India bug
     const searchQuery = encodeURIComponent(countryName);
     let url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
     
     let urls = [];
     let pixabaySuccess = false;
 
-    // 2. Try Pixabay
     try {
         let res = await fetchWithTimeout(url);
         
-        // Handle Rate Limit Swapping
         if (res.status === 429 && activeKey === 'primary') {
             console.warn("Primary Pixabay key limited. Switching to backup...");
             activeKey = 'backup'; 
             url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
-            res = await fetchWithTimeout(url); // Try again with backup
+            res = await fetchWithTimeout(url); 
         }
 
         if (res.ok) {
             const data = await res.json();
-            // Make sure Pixabay actually found images (Fixes the Somalia blank/wrong image issue)
             if (data.hits && data.hits.length > 0) {
                 for (let i = 0; i < Math.min(2, data.hits.length); i++) {
                     urls.push(data.hits[i].webformatURL); 
@@ -527,15 +502,13 @@ async function fetchCountryImages(countryName, isoCode) {
         console.warn("Pixabay timed out or failed completely.");
     }
 
-    // 3. The Wikipedia Fallback
-    // Triggers if Pixabay timed out, threw a 429 on BOTH keys, or found 0 images
     if (!pixabaySuccess || urls.length === 0) {
         console.log(`Pixabay failed for ${countryName}. Triggering Wikipedia Fallback...`);
-        urls = await fetchWikipediaFallback(isoCode, countryName);
+        // Defensive assignment: If Wiki fails entirely, force it to be an empty array
+        urls = (await fetchWikipediaFallback(isoCode, countryName)) || [];
     }
 
-    // 4. Cache the results (Only cache if we actually got images)
-    if (urls.length > 0) {
+    if (urls && urls.length > 0) {
         localStorage.setItem(cacheKey, JSON.stringify({
             urls: urls,
             timestamp: Date.now()
