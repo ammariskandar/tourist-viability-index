@@ -1,229 +1,356 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tourist Viability Index</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
-    <style>
-        body { 
-            font-family: system-ui, -apple-system, sans-serif; 
-            background: #f9f9f9; 
-            color: #111; 
-            margin: 0; 
-            padding: 2rem; 
-        }
-        .max-width { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-        }
-        p.subtitle { 
-            font-size: 0.7rem; 
-            color: #7f8c8d; 
-            font-style: italic; 
-            margin-top: -10px; 
-            margin-bottom: 1rem; 
-        }
-        .country-card { 
-            background: white; 
-            padding: 1.5rem; 
-            border-bottom: 1px solid #eee; 
-            display: flex; 
-            flex-direction: column;
-        }
-        
-        .card-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            width: 100%; 
-            cursor: pointer;
-            user-select: none;
-        }
-        
-        .card-header:hover h2 {
-            color: #3498db;
-        }
-        .details { 
-            font-size: 0.85rem; 
-            color: #666; 
-            margin-top: 1rem; 
-            padding-top: 1rem; 
-            border-top: 1px dashed #ddd; 
-            display: none; 
-        }
-        .details.show { 
-            display: block; 
-        }
-        .score { font-size: 1.5rem; font-weight: bold; color: #2c3e50; }
-        .penalty-flag { color: #e74c3c; font-weight: bold; }
-        .status-highly-recommended { color: #27ae60; font-weight: bold; }
-        .status-okay { color: #f39c12; font-weight: bold; }
-        .status-avoid { color: #e74c3c; font-weight: bold; }
-        .status-danger { color: #900c3f; font-weight: bold; }
-        .status-indicator {
-            font-size: 1rem;
-            margin-left: 10px;
-            display: inline;
-        }
-        @media (max-width: 600px) {
-            p.subtitle {
-                display: none; 
-            }
-            body {
-                padding: 1rem 0.5rem;
-            }
-            .country-card {
-                padding: 1rem; 
-            }
-            .status-indicator {
-                display: block; 
-                font-size: 0.6rem; 
-                margin-left: 0; 
-                margin-top: 5px; 
-            }
-            .card-header h2 {
-                line-height: 1.2; 
-            }
-            .country-name {
-                font-size: 75%; 
-            }
-            .rank-number {
-                font-size: 60%; 
-                margin-right: 2px; 
-            }
-        }
-        .advisory-toast {
-            font-size: 0.75rem;
-            margin-left: 10px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            border: 1px solid;
-            display: inline-flex;
-            align-items: center;
-            font-weight: normal;
-            background-color: #fff;
-            vertical-align: middle;
-        }
-        .advisory-level-3 {
-            color: #e67e22;
-            border-color: #e67e22;
-        }
-        .advisory-level-4 {
-            color: #c0392b; 
-            border-color: #c0392b;
-        }
-        .advisory-toast:hover {
-            opacity: 0.8;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-        .stat-box {
-            background: #f8f9fa;
-            border: 1px solid #eee;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        .stat-label {
-            display: block;
-            font-size: 0.75rem;
-            color: #7f8c8d;
-            margin-bottom: 4px;
-        }
-        .stat-value {
-            display: block;
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        @media (max-width: 700px) {
-            p.subtitle {
-                display: none; 
-            }
-            body {
-                padding: 1rem 0.5rem;
-            }
-            .country-card {
-                padding: 1rem; 
-            }
-            .status-indicator {
-                display: block; 
-                font-size: 0.6rem; 
-                margin-left: 0; 
-                margin-top: 5px; 
-            }
-            .card-header h2 {
-                line-height: 1.2; 
-            }
-            .country-name {
-                font-size: 60%; 
-            }
-            .rank-number {
-                font-size: 58%; 
-                margin-right: 2px; 
-            }
-            .advisory-toast {
-                display: inline-block; 
-                margin-left: 0;
-                margin-top: 5px;
-                font-size: 0.6rem;
-            }
-        }
-        @keyframes shimmer {
-        0% { background-position: -1000px 0; }
-        100% { background-position: 1000px 0; }
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tourist Viability Index</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f9f9f9;
+      color: #111;
+      margin: 0;
+      padding: 2rem;
+    }
 
-        .shimmer-box {
-            animation: shimmer 2s infinite linear;
-            background: linear-gradient(to right, #f6f7f8 4%, #edeef1 25%, #f6f7f8 36%);
-            background-size: 1000px 100%;
-            border-radius: 8px;
-            width: calc(50% - 5px);
-            height: 300px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
+    .max-width {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-    </style>
+    header h1 {
+      margin: 0 0 0.25rem;
+      line-height: 1.1;
+    }
+
+    .intro-text {
+      font-size: 1.05rem;
+      font-style: italic;
+      color: #7f8c8d;
+      margin: -0.5rem 0 1rem;
+      line-height: 1.5;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: #7f8c8d;
+      font-style: italic;
+      margin: 0 0 1.75rem;
+      line-height: 1.7;
+    }
+
+    .controls-container {
+      display: flex;
+      gap: 25px;
+      margin-bottom: 20px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .download-btn {
+      padding: 8px 16px;
+      cursor: pointer;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .search-input {
+      padding: 8px;
+      width: 400px;
+      border: 1px solid #dcdcdc;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    .solo-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .loading-message {
+      margin-bottom: 1.25rem;
+      color: #555;
+    }
+
+    .page-footer {
+      text-align: center;
+      padding: 2rem 0 1rem;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      border-top: 1px solid #eee;
+    }
+
+    .page-footer a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    .page-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-badge {
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-badge img {
+      vertical-align: middle;
+    }
+
+    /* --- COUNTRY CARDS --- */
+    .country-card {
+      background: white;
+      padding: 1.5rem;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .card-header:hover h2 {
+      color: #3498db;
+    }
+
+    .details {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed #ddd;
+      display: none;
+    }
+
+    .details.show {
+      display: block;
+    }
+
+    .score {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .penalty-flag {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .status-highly-recommended {
+      color: #27ae60;
+      font-weight: bold;
+    }
+
+    .status-okay {
+      color: #f39c12;
+      font-weight: bold;
+    }
+
+    .status-avoid,
+    .status-danger {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .status-danger {
+      color: #900c3f;
+    }
+
+    .status-indicator {
+      font-size: 1rem;
+      margin-left: 10px;
+      display: inline;
+    }
+
+    .advisory-toast {
+      font-size: 0.75rem;
+      margin-left: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid;
+      display: inline-flex;
+      align-items: center;
+      background-color: #fff;
+      vertical-align: middle;
+    }
+
+    .advisory-level-3 {
+      color: #e67e22;
+      border-color: #e67e22;
+    }
+
+    .advisory-level-4 {
+      color: #c0392b;
+      border-color: #c0392b;
+    }
+
+    .advisory-toast:hover {
+      opacity: 0.8;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .stat-box {
+      background: #f8f9fa;
+      border: 1px solid #eee;
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.75rem;
+      color: #7f8c8d;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    .shimmer-box {
+      animation: shimmer 2s infinite linear;
+      background: linear-gradient(to right, #f6f7f8 4%, #edeef1 25%, #f6f7f8 36%);
+      background-size: 1000px 100%;
+      border-radius: 8px;
+      width: calc(50% - 5px);
+      height: 300px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 1rem 0.5rem;
+      }
+
+      .subtitle {
+        display: none;
+      }
+
+      .country-card {
+        padding: 1rem;
+      }
+
+      .card-header h2 {
+        line-height: 1.2;
+      }
+
+      .country-name {
+        font-size: 60%;
+      }
+
+      .rank-number {
+        font-size: 58%;
+        margin-right: 2px;
+      }
+
+      .status-indicator {
+        display: block;
+        font-size: 0.6rem;
+        margin-left: 0;
+        margin-top: 5px;
+      }
+
+      .advisory-toast {
+        display: inline-block;
+        margin-left: 0;
+        margin-top: 5px;
+        font-size: 0.6rem;
+      }
+
+      .controls-container {
+        gap: 12px;
+      }
+
+      .download-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .search-input {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .solo-label {
+        font-size: 13px;
+        gap: 5px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="max-width">
-        <h1>Recommended Countries for Travel</h1>
-        
-        <p style="font-size: 1.05em; font-style: italic; font-weight: normal; color: #7f8c8d; margin-top: -10px; margin-bottom: 15px;">
-            Please do your own further research and do not use this index as your sole source of information. We hold no responsibility for your travel decisions.
-        </p>
+  <div class="max-width">
+    <header>
+      <h1>Recommended Countries for Travel</h1>
+      <p class="intro-text">
+        Please do your own further research and do not use this index as your sole source of information. We hold no responsibility for your travel decisions.
+      </p>
+      <p class="subtitle">
+        A comprehensive, data-driven index of global safety, livability, and accessibility. Base scores evaluate physical safety, geopolitical stability, severe crime risk, diplomatic mobility, and economic realities (GDP and Cost of Living). The model algorithmically corrects for institutional Eurocentric reporting bias and microstate statistical anomalies while applying strict penalties for active conflict zones, extreme isolation, and failing to report femicide data. Finally, the index rewards cultural and natural richness (UNESCO top sites, natural landscapes) and adjusts for inclusive travel accessibility (Muslim-friendly environments) to provide a truly holistic global ranking.
+      </p>
+    </header>
 
-        <p class="subtitle">A comprehensive, data-driven index of global safety, livability, and accessibility. Base scores evaluate physical safety, geopolitical stability, severe crime risk, diplomatic mobility, and economic realities (GDP and Cost of Living). The model algorithmically corrects for institutional Eurocentric reporting bias and microstate statistical anomalies while applying strict penalties for active conflict zones, extreme isolation, and failing to report femicide data. Finally, the index rewards cultural and natural richness (UNESCO top sites, natural landscapes) and adjusts for inclusive travel accessibility (Muslim-friendly environments) to provide a truly holistic global ranking.</p>       
-        
-        <div id="loading">Loading data...</div>
-        <div style="display: flex; gap: 25px; margin-bottom: 20px; align-items: center; justify-content: center;">
-            <button id="downloadBtn" style="padding: 8px 16px; cursor: pointer; background-color: #2c3e50; color: white; border: none; border-radius: 4px; font-weight: bold;"> 
-                📥 CSV
-            </button>
-            <input type="text" id="searchInput" placeholder="Search country..." style="display:none; padding: 8px; width: 350px;">
-            <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer;">
-                <input type="checkbox" id="soloToggle"> Solo Traveler Mode
-            </label>
-        </div>
-        <div id="results-container"></div>
+    <div id="loading" class="loading-message">Loading data...</div>
+
+    <div class="controls-container">
+      <button id="downloadBtn" class="download-btn">📥 CSV</button>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search country..." hidden>
+      <label class="solo-label">
+        <input type="checkbox" id="soloToggle">
+        Solo Traveler Mode
+      </label>
     </div>
 
-    <script src="app.js"></script>
-</body>
-    <footer style="text-align: center; padding: 20px; margin-top: 40px; font-size: 14px; color: #7f8c8d; border-top: 1px solid #eee;">
-        <div style="margin-bottom: 10px;">
-            <span style="vertical-align: middle; margin-right: 10px;">Total Explorers:</span>
-            <img src="https://visitor-badge.laobi.icu/badge?page_id=ammars-travel-index-8842" alt="Visitor Count" style="vertical-align: middle;" />
-        </div>
-        <div>
-            Travel advisories powered by <a href="https://github.com/kevle1/smartraveller-api" target="_blank" style="color: #3498db; text-decoration: none;">Kevle's Smartraveller API</a>.
-        </div>
-        
+    <main id="results-container"></main>
+
+    <footer class="page-footer">
+      <div class="footer-badge">
+        <span>Total Explorers:</span>
+        <img src="https://visitor-badge.laobi.icu/badge?page_id=ammars-travel-index-8842" alt="Visitor Count">
+      </div>
+      <div>
+        Travel advisories powered by <a href="https://github.com/kevle1/smartraveller-api" target="_blank" rel="noopener noreferrer">Kevle's Smartraveller API</a>.
+      </div>
     </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
 </html>
