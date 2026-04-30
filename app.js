@@ -44,9 +44,9 @@ const MICHELIN_TOP_10 = ['FR', 'AE', 'IT', 'JP', 'DE', 'ES', 'US', 'GB', 'CH', '
 
 const SOLO_TIERS = {
     "S": { points: 15, countries: ["Singapore", "Japan", "Australia", "New Zealand", "United Arab Emirates"] },
-    "A": { points: 10, countries: ["South Korea", "Taiwan", "Malaysia", "Denmark", "Portugal"] },
+    "A": { points: 10, countries: ["South Korea", "Taiwan", "Malaysia", "Denmark", "Malta"] },
     "B": { points: 5, countries: ["Thailand", "Iceland", "Latvia", "Belgium", "Greece", "Jordan","Monaco","Germany","Norway"] },
-    "C": { points: 2.5, countries: ["Vietnam", "Nepal", "Cambodia", "United Kingdom", "France", "Spain","Finland"] },
+    "C": { points: 2.5, countries: ["Vietnam", "Nepal", "Cambodia", "United Kingdom", "France", "Spain","Finland","Portugal"] },
     "D": { points: 1, countries: ["Botswana", "Saudi Arabia", "Brunei"] }
 };
 
