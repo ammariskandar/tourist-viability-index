@@ -484,7 +484,9 @@ async function fetchCountryImages(countryName, isoCode) {
         }
     }
 
+
     const capitalName = await getCapitalCity(isoCode);
+    
 
     const stopWords = ['of', 'the', 'and', 'republic', 'democratic', 'united', 'states', 'kingdom', 'islands', 'island', 'central'];
     const requiredKeywords = countryName.toLowerCase().split(/[\s-]+/).filter(w => !stopWords.includes(w) && w.length > 2);
@@ -508,16 +510,19 @@ async function fetchCountryImages(countryName, isoCode) {
         if (res.ok) {
             const data = await res.json();
             if (data.hits && data.hits.length > 0) {
-
+                
+                
                 let validHits = [];
                 for (const hit of data.hits) {
                     const metadata = ((hit.tags || "") + " " + (hit.pageURL || "")).toLowerCase();
-
+                    
+                    
                     const isRelevant = requiredKeywords.some(keyword => metadata.includes(keyword));
                     
                     if (isRelevant) {
                         validHits.push(hit.webformatURL);
                         if (validHits.length === 2) break;
+                    }
                 }
 
                 if (validHits.length > 0) {
@@ -531,6 +536,8 @@ async function fetchCountryImages(countryName, isoCode) {
     } catch (e) {
         console.warn("Pixabay timed out or failed completely.");
     }
+
+    
     if (!pixabaySuccess || urls.length === 0) {
         console.log(`Triggering Wikipedia Fallback for ${countryName}...`);
         urls = (await fetchWikipediaFallback(countryName, capitalName)) || [];
@@ -544,8 +551,7 @@ async function fetchCountryImages(countryName, isoCode) {
     }
     
     return urls;
-
-    }}
+}
 
 function renderList(rankedCountries) {
     const container = document.getElementById('results-container');
