@@ -44,9 +44,9 @@ const MICHELIN_TOP_10 = ['FR', 'AE', 'IT', 'JP', 'DE', 'ES', 'US', 'GB', 'CH', '
 
 const SOLO_TIERS = {
     "S": { points: 15, countries: ["Singapore", "Japan", "Australia", "New Zealand", "United Arab Emirates"] },
-    "A": { points: 10, countries: ["South Korea", "Taiwan", "Malaysia", "Germany", "Portugal"] },
-    "B": { points: 5, countries: ["Thailand", "Iceland", "Latvia", "Belgium", "Greece", "Jordan"] },
-    "C": { points: 2.5, countries: ["Vietnam", "Nepal", "Cambodia", "United Kingdom", "France", "Spain"] },
+    "A": { points: 10, countries: ["South Korea", "Taiwan", "Malaysia", "Denmark", "Portugal"] },
+    "B": { points: 5, countries: ["Thailand", "Iceland", "Latvia", "Belgium", "Greece", "Jordan","Monaco","Germany","Norway"] },
+    "C": { points: 2.5, countries: ["Vietnam", "Nepal", "Cambodia", "United Kingdom", "France", "Spain","Finland"] },
     "D": { points: 1, countries: ["Botswana", "Saudi Arabia", "Brunei"] }
 };
 
@@ -183,7 +183,7 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         unescoCombinedStatus = "Top 15 Globally (+5)";
         unescoCombinedColor = "color: #27ae60;"
     } 
-    // 2. Otherwise, check for the Penalty
+
     else if (!UNESCO_MIN_6.includes(country.iso_code)) {
         if (MICROSTATES.includes(country.iso_code)) {
             totalScore -= 10;
