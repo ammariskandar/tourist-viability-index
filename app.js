@@ -372,22 +372,24 @@ async function fetchWithTimeout(url, timeoutMs = 4000) {
     return response;
 }
 
-// --- HELPER 2: The STRICT Wikipedia Fallback Engine ---
-async function fetchWikipediaFallback(isoCode, countryName) {
-    let capitalName = null;
-
+// --- HELPER 2: Get Capital City (Hoisted so both APIs can use it) ---
+async function getCapitalCity(isoCode) {
     try {
         const rcRes = await fetchWithTimeout(`https://restcountries.com/v3.1/alpha/${isoCode}`, 3000);
         if (rcRes.ok) {
             const rcData = await rcRes.json();
             if (rcData[0] && rcData[0].capital && rcData[0].capital[0]) {
-                capitalName = rcData[0].capital[0]; 
+                return rcData[0].capital[0]; 
             }
         }
     } catch (e) {
-        console.warn("RestCountries failed, will only use Country Name for Wikipedia.");
+        console.warn("RestCountries failed to fetch capital.");
     }
+    return null;
+}
 
+// --- HELPER 3: The STRICT Wikipedia Fallback Engine ---
+async function fetchWikipediaFallback(countryName, capitalName) {
     async function executeStrictWikiSearch(searchTerm) {
         const searchQuery = encodeURIComponent(searchTerm);
         const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${searchQuery}&gsrnamespace=6&gsrlimit=20&prop=imageinfo&iiprop=url&format=json&origin=*`;
@@ -410,23 +412,14 @@ async function fetchWikipediaFallback(isoCode, countryName) {
                 
                 const lowerUrl = imgUrl.toLowerCase();
                 
-                // FATAL FILTER 1: Must be an actual photograph format
-                if (!lowerUrl.endsWith('.jpg') && !lowerUrl.endsWith('.jpeg') && !lowerUrl.endsWith('.png')) {
-                    continue;
-                }
+                if (!lowerUrl.endsWith('.jpg') && !lowerUrl.endsWith('.jpeg') && !lowerUrl.endsWith('.png')) continue;
+                if (lowerUrl.includes('map') || lowerUrl.includes('flag') || lowerUrl.includes('logo') || lowerUrl.includes('icon')) continue;
 
-                // FATAL FILTER 2: No maps, flags, logos, or icons
-                if (lowerUrl.includes('map') || lowerUrl.includes('flag') || lowerUrl.includes('logo') || lowerUrl.includes('icon')) {
-                    continue;
-                }
-
-                // Clean title for comparison
                 let cleanTitle = title.replace(/^File:/i, '').replace(/\.[a-zA-Z0-9]+$/i, '').trim();
                 let lowerCleanTitle = cleanTitle.toLowerCase();
                 let lowerSearch = searchTerm.toLowerCase();
                 let wordCount = cleanTitle.split(/\s+/).length;
 
-                // FATAL FILTER 3: Must strictly contain the name
                 if (lowerCleanTitle === lowerSearch) {
                     validImages.push({ url: imgUrl, rank: 1, wordCount: wordCount });
                 } else if (lowerCleanTitle.includes(lowerSearch)) {
@@ -455,7 +448,6 @@ async function fetchWikipediaFallback(isoCode, countryName) {
         urls = await executeStrictWikiSearch(countryName);
     }
 
-    // Safety check: ensure we absolutely return an array
     return Array.isArray(urls) ? urls.slice(0, 2) : [];
 }
 
@@ -472,9 +464,16 @@ async function fetchCountryImages(countryName, isoCode) {
         }
     }
 
-    // Notice: "travel" keyword is permanently removed to prevent the Germany/India bug
+    // 1. Get the capital city first so we can validate Pixabay
+    const capitalName = await getCapitalCity(isoCode);
+    
+    // 2. Setup Validation Keywords (Filter out stop words that cause Token Bleed)
+    const stopWords = ['of', 'the', 'and', 'republic', 'democratic', 'united', 'states', 'kingdom', 'islands', 'island', 'central'];
+    const requiredKeywords = countryName.toLowerCase().split(/[\s-]+/).filter(w => !stopWords.includes(w) && w.length > 2);
+    if (capitalName) requiredKeywords.push(capitalName.toLowerCase());
+
     const searchQuery = encodeURIComponent(countryName);
-    let url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
+    let url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=5`;
     
     let urls = [];
     let pixabaySuccess = false;
@@ -483,29 +482,45 @@ async function fetchCountryImages(countryName, isoCode) {
         let res = await fetchWithTimeout(url);
         
         if (res.status === 429 && activeKey === 'primary') {
-            console.warn("Primary Pixabay key limited. Switching to backup...");
             activeKey = 'backup'; 
-            url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
+            url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=5`;
             res = await fetchWithTimeout(url); 
         }
 
         if (res.ok) {
             const data = await res.json();
             if (data.hits && data.hits.length > 0) {
-                for (let i = 0; i < Math.min(2, data.hits.length); i++) {
-                    urls.push(data.hits[i].webformatURL); 
+                
+                // 3. The Pixabay Validation Engine
+                let validHits = [];
+                for (const hit of data.hits) {
+                    const metadata = ((hit.tags || "") + " " + (hit.pageURL || "")).toLowerCase();
+                    
+                    // Check if the metadata contains at least one required keyword (e.g., "Congo" or "Kinshasa")
+                    const isRelevant = requiredKeywords.some(keyword => metadata.includes(keyword));
+                    
+                    if (isRelevant) {
+                        validHits.push(hit.webformatURL);
+                        if (validHits.length === 2) break; // Stop once we have 2 good photos
+                    }
                 }
-                pixabaySuccess = true;
+
+                if (validHits.length > 0) {
+                    urls = validHits;
+                    pixabaySuccess = true;
+                } else {
+                    console.log(`Pixabay returned hits for ${countryName}, but failed metadata validation. (Token Bleed prevented)`);
+                }
             }
         }
     } catch (e) {
         console.warn("Pixabay timed out or failed completely.");
     }
 
+    // 4. Trigger Wikipedia if Pixabay failed, timed out, or returned invalid photos
     if (!pixabaySuccess || urls.length === 0) {
-        console.log(`Pixabay failed for ${countryName}. Triggering Wikipedia Fallback...`);
-        // Defensive assignment: If Wiki fails entirely, force it to be an empty array
-        urls = (await fetchWikipediaFallback(isoCode, countryName)) || [];
+        console.log(`Triggering Wikipedia Fallback for ${countryName}...`);
+        urls = (await fetchWikipediaFallback(countryName, capitalName)) || [];
     }
 
     if (urls && urls.length > 0) {
