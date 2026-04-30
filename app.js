@@ -462,7 +462,7 @@ async function fetchCountryImages(countryName, isoCode) {
         }
     }
 
-    const searchQuery = encodeURIComponent(`${countryName} travel`);
+    const searchQuery = encodeURIComponent(countryName);
     let url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
     
     let urls = [];
