@@ -856,6 +856,46 @@ async function init() {
         const loadingEl = document.getElementById('loading');
         if (loadingEl) loadingEl.innerText = "Error loading data.";
     }
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+    const isSolo = document.getElementById('soloToggle').checked;
+    
+    // Pass whatever array represents the CURRENT state of the screen
+    downloadCSV(sortedCountries, isSolo); 
+});
+}
+
+function downloadCSV(currentData, isSoloMode) {
+    // 1. Create the CSV header
+    let csvContent = "Rank,Country\n";
+
+    // 2. Loop through the currently sorted data
+    currentData.forEach((c, index) => {
+        // We use index + 1 so the downloaded list is neatly numbered 1 to N
+        // We wrap the country name in quotes just in case a country name has a comma in it
+        csvContent += `${index + 1},"${c.country}"\n`;
+    });
+
+    // 3. Create a Blob (a raw data file in the browser's memory)
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // 4. Create a temporary, invisible link to trigger the download
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    // Name the file dynamically based on the mode
+    const fileName = isSoloMode ? "solo_travel_rankings.csv" : "travel_rankings.csv";
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", fileName);
+    link.style.visibility = 'hidden';
+    
+    // 5. Append, click, and destroy the link
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Free up browser memory
+    URL.revokeObjectURL(url);
 }
 
 init();
