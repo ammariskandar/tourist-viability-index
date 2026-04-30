@@ -311,12 +311,11 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
     }
 
     let soloBonusText = '';
-    
-    // Only run this adjustment if we are in solo mode
+
     if (isSoloMode) { 
         let bonus = 0;
         let tierName = '';
-        const cName = country.country; // Assuming 'country.country' holds the name
+        const cName = country.country;
 
         if (SOLO_TIERS.S.countries.includes(cName)) { bonus = SOLO_TIERS.S.points; tierName = 'S-Tier'; }
         else if (SOLO_TIERS.A.countries.includes(cName)) { bonus = SOLO_TIERS.A.points; tierName = 'A-Tier'; }
@@ -326,7 +325,6 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
 
         if (bonus > 0) {
             totalScore += bonus;
-            // Saving the text to display later
             soloBonusText = `*Solo Travel ${tierName} consensus bonus applied (+${bonus})`;
         }
     }
@@ -381,10 +379,6 @@ async function fetchLiveAQI(isoCode) {
     return mockAqi;
 }
 
-
-
-
-// Store both your encoded keys here
 const PIXABAY_KEYS = {
     primary: 'NTU2NDcwMDctZWM4NjNmZTY0NzIwY2ZhN2UxODQ1MDFiMg==', 
     backup: 'NTU2NDc0NjMtYmU2N2UwYzFhNDkyNGY0OTc1NGY3MWUxMg==' 
@@ -393,7 +387,6 @@ const PIXABAY_KEYS = {
 let activeKey = 'primary';
 const getPixabayKey = () => atob(PIXABAY_KEYS[activeKey]);
 
-// --- HELPER 1: Fetch with forced timeout ---
 async function fetchWithTimeout(url, timeoutMs = 4000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
@@ -402,7 +395,6 @@ async function fetchWithTimeout(url, timeoutMs = 4000) {
     return response;
 }
 
-// --- HELPER 2: Get Capital City (Hoisted so both APIs can use it) ---
 async function getCapitalCity(isoCode) {
     try {
         const rcRes = await fetchWithTimeout(`https://restcountries.com/v3.1/alpha/${isoCode}`, 3000);
@@ -418,7 +410,6 @@ async function getCapitalCity(isoCode) {
     return null;
 }
 
-// --- HELPER 3: The STRICT Wikipedia Fallback Engine ---
 async function fetchWikipediaFallback(countryName, capitalName) {
     async function executeStrictWikiSearch(searchTerm) {
         const searchQuery = encodeURIComponent(searchTerm);
@@ -481,7 +472,6 @@ async function fetchWikipediaFallback(countryName, capitalName) {
     return Array.isArray(urls) ? urls.slice(0, 2) : [];
 }
 
-// --- MAIN FETCH FUNCTION ---
 async function fetchCountryImages(countryName, isoCode) {
     const cacheKey = `pixabay_cache_${isoCode}`;
     const cachedData = localStorage.getItem(cacheKey);
@@ -494,10 +484,8 @@ async function fetchCountryImages(countryName, isoCode) {
         }
     }
 
-    // 1. Get the capital city first so we can validate Pixabay
     const capitalName = await getCapitalCity(isoCode);
-    
-    // 2. Setup Validation Keywords (Filter out stop words that cause Token Bleed)
+
     const stopWords = ['of', 'the', 'and', 'republic', 'democratic', 'united', 'states', 'kingdom', 'islands', 'island', 'central'];
     const requiredKeywords = countryName.toLowerCase().split(/[\s-]+/).filter(w => !stopWords.includes(w) && w.length > 2);
     if (capitalName) requiredKeywords.push(capitalName.toLowerCase());
@@ -520,19 +508,16 @@ async function fetchCountryImages(countryName, isoCode) {
         if (res.ok) {
             const data = await res.json();
             if (data.hits && data.hits.length > 0) {
-                
-                // 3. The Pixabay Validation Engine
+
                 let validHits = [];
                 for (const hit of data.hits) {
                     const metadata = ((hit.tags || "") + " " + (hit.pageURL || "")).toLowerCase();
-                    
-                    // Check if the metadata contains at least one required keyword (e.g., "Congo" or "Kinshasa")
+
                     const isRelevant = requiredKeywords.some(keyword => metadata.includes(keyword));
                     
                     if (isRelevant) {
                         validHits.push(hit.webformatURL);
-                        if (validHits.length === 2) break; // Stop once we have 2 good photos
-                    }
+                        if (validHits.length === 2) break;
                 }
 
                 if (validHits.length > 0) {
@@ -546,8 +531,6 @@ async function fetchCountryImages(countryName, isoCode) {
     } catch (e) {
         console.warn("Pixabay timed out or failed completely.");
     }
-
-    // 4. Trigger Wikipedia if Pixabay failed, timed out, or returned invalid photos
     if (!pixabaySuccess || urls.length === 0) {
         console.log(`Triggering Wikipedia Fallback for ${countryName}...`);
         urls = (await fetchWikipediaFallback(countryName, capitalName)) || [];
@@ -859,49 +842,51 @@ async function init() {
     document.getElementById('downloadBtn').addEventListener('click', () => {
         const soloToggle = document.getElementById('soloToggle');
         const isSolo = soloToggle ? soloToggle.checked : false;
-        
-        // Scrape the exact list of countries currently visible on the page
         const visibleCountries = Array.from(document.querySelectorAll('.country-name')).map(node => {
             return { country: node.getAttribute('data-name') };
         });
-
-        // Pass that scraped list into your CSV function
         downloadCSV(visibleCountries, isSolo); 
     });
 }
 
 function downloadCSV(currentData, isSoloMode) {
-    // 1. Create the CSV header
     let csvContent = "Rank,Country\n";
-
-    // 2. Loop through the currently sorted data
     currentData.forEach((c, index) => {
-        // We use index + 1 so the downloaded list is neatly numbered 1 to N
-        // We wrap the country name in quotes just in case a country name has a comma in it
         csvContent += `${index + 1},"${c.country}"\n`;
     });
 
-    // 3. Create a Blob (a raw data file in the browser's memory)
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    
-    // 4. Create a temporary, invisible link to trigger the download
+
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
-    
-    // Name the file dynamically based on the mode
+
     const fileName = isSoloMode ? "solo_travel_rankings.csv" : "travel_rankings.csv";
     
     link.setAttribute("href", url);
     link.setAttribute("download", fileName);
     link.style.visibility = 'hidden';
-    
-    // 5. Append, click, and destroy the link
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
-    // Free up browser memory
+
     URL.revokeObjectURL(url);
 }
+const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+
+window.addEventListener("scroll", () => {
+    if (window.scrollY > 300) {
+        scrollToTopBtn.classList.add("show");
+    } else {
+        scrollToTopBtn.classList.remove("show");
+    }
+});
+
+scrollToTopBtn.addEventListener("click", () => {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+});
 
 init();
