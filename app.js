@@ -42,6 +42,14 @@ const IATA_81_100 = ['MT', 'SV', 'AZ', 'GE', 'AL', 'BS', 'NG', 'EC', 'CU', 'GT',
 
 const MICHELIN_TOP_10 = ['FR', 'AE', 'IT', 'JP', 'DE', 'ES', 'US', 'GB', 'CH', 'CN'];
 
+const SOLO_TIERS = {
+    "S": { points: 15, countries: ["Singapore", "Japan", "Australia", "New Zealand", "United Arab Emirates"] },
+    "A": { points: 10, countries: ["South Korea", "Taiwan", "Malaysia", "Germany", "Portugal"] },
+    "B": { points: 5, countries: ["Thailand", "Iceland", "Latvia", "Belgium", "Greece", "Jordan"] },
+    "C": { points: 2.5, countries: ["Vietnam", "Nepal", "Cambodia", "United Kingdom", "France", "Spain"] },
+    "D": { points: 1, countries: ["Botswana", "Saudi Arabia", "Brunei"] }
+};
+
 function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false) {
     const raw = country.scores_raw;
     
@@ -302,6 +310,27 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         michelinColor = "color: #27ae60;";
     }
 
+    let soloBonusText = '';
+    
+    // Only run this adjustment if we are in solo mode
+    if (isSoloMode) { 
+        let bonus = 0;
+        let tierName = '';
+        const cName = country.country; // Assuming 'country.country' holds the name
+
+        if (SOLO_TIERS.S.countries.includes(cName)) { bonus = SOLO_TIERS.S.points; tierName = 'S-Tier'; }
+        else if (SOLO_TIERS.A.countries.includes(cName)) { bonus = SOLO_TIERS.A.points; tierName = 'A-Tier'; }
+        else if (SOLO_TIERS.B.countries.includes(cName)) { bonus = SOLO_TIERS.B.points; tierName = 'B-Tier'; }
+        else if (SOLO_TIERS.C.countries.includes(cName)) { bonus = SOLO_TIERS.C.points; tierName = 'C-Tier'; }
+        else if (SOLO_TIERS.D.countries.includes(cName)) { bonus = SOLO_TIERS.D.points; tierName = 'D-Tier'; }
+
+        if (bonus > 0) {
+            totalScore += bonus;
+            // Saving the text to display later
+            soloBonusText = `*Solo Travel ${tierName} consensus bonus applied (+${bonus})`;
+        }
+    }
+
     if (isSoloMode) {
         totalScore = Math.max(0, totalScore*0.80);
     } else {
@@ -334,6 +363,7 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         michelinColor: michelinColor,      
         unescoCombinedStatus: unescoCombinedStatus,
         unescoCombinedColor: unescoCombinedColor,
+        soloBonusText: soloBonusText,
     };
 }
 
@@ -549,6 +579,7 @@ function renderList(rankedCountries) {
         const isolationText = c.isolationPenaltyText ? `<br><span class="penalty-flag">${c.isolationPenaltyText}</span>` : '';
         const microText = c.microstatePenaltyText ? `<br><span class="penalty-flag">${c.microstatePenaltyText}</span>` : '';
         const euroText = c.eurocentricPenaltyText ? `<br><span class="penalty-flag">${c.eurocentricPenaltyText}</span>` : '';
+        const soloText = c.soloBonusText ? `<br><span class="penalty-flag" style="color: #27ae60;">${c.soloBonusText}</span>` : '';
         
         let statusText = '';
         let statusClass = '';
@@ -665,6 +696,7 @@ function renderList(rankedCountries) {
                         ${isolationText}
                         ${microText}
                         ${euroText}
+                        ${soloText}
                     </div>
                 </div>
             </div>
