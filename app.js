@@ -389,62 +389,95 @@ async function fetchWikipediaFallback(isoCode, countryName) {
     }
 
     // Step 2: Query Wikipedia
-    const searchQuery = encodeURIComponent(searchTerm);
-    const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${searchQuery}&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url&format=json&origin=*`;
-    
+    async function fetchWikipediaFallback(isoCode, countryName) {
+    let capitalName = null;
+
+    // Step 1: Get the Capital
     try {
-        const res = await fetchWithTimeout(url, 5000);
-        const data = await res.json();
-        const pages = data.query?.pages;
-        
-        if (!pages) return [];
-        
-        let validImages = [];
-        
-        for (const key in pages) {
-            const imgInfo = pages[key].imageinfo?.[0];
-            const title = pages[key].title || "";
-            const imgUrl = imgInfo?.url;
-            
-            if (!imgUrl) continue;
-            
-            const lowerUrl = imgUrl.toLowerCase();
-            // Filter out junk
-            if (lowerUrl.includes('.svg') || lowerUrl.includes('map') || lowerUrl.includes('flag') || lowerUrl.includes('logo') || lowerUrl.includes('icon')) {
-                continue;
+        const rcRes = await fetchWithTimeout(`https://restcountries.com/v3.1/alpha/${isoCode}`, 3000);
+        if (rcRes.ok) {
+            const rcData = await rcRes.json();
+            if (rcData[0] && rcData[0].capital && rcData[0].capital[0]) {
+                capitalName = rcData[0].capital[0]; 
             }
-
-            // Step 3: Clean the title for ranking
-            // Removes "File:" at the start and ".jpg/.png" at the end
-            let cleanTitle = title.replace(/^File:/i, '').replace(/\.[a-zA-Z0-9]+$/i, '').trim();
-            let lowerCleanTitle = cleanTitle.toLowerCase();
-            let lowerSearch = searchTerm.toLowerCase();
-            let wordCount = cleanTitle.split(/\s+/).length;
-
-            // Step 4: Apply your Custom Ranking Algorithm
-            let rank = 3; // Default (Lowest Priority)
-            
-            if (lowerCleanTitle === lowerSearch) {
-                rank = 1; // Highest Priority: Exact match (e.g. "Mogadishu.jpg")
-            } else if (lowerCleanTitle.includes(lowerSearch)) {
-                rank = 2; // Medium Priority: Contains the name. We will use wordCount to sort these.
-            }
-            
-            validImages.push({ url: imgUrl, rank: rank, wordCount: wordCount });
         }
-
-        // Step 5: Sort by Rank first, then by Word Count (Shorter titles are better)
-        validImages.sort((a, b) => {
-            if (a.rank !== b.rank) return a.rank - b.rank; // Sort by Rank 1, 2, 3
-            return a.wordCount - b.wordCount;              // If same rank, shorter title wins
-        });
-
-        // Return top 2 URLs
-        return validImages.slice(0, 2).map(img => img.url);
-        
     } catch (e) {
-        console.error("Wikipedia fallback completely failed:", e);
-        return [];
+        console.warn("RestCountries failed, will only use Country Name for Wikipedia.");
+    }
+
+    // Step 2: The Ruthless Search & Filter Engine
+    async function executeStrictWikiSearch(searchTerm) {
+        const searchQuery = encodeURIComponent(searchTerm);
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${searchQuery}&gsrnamespace=6&gsrlimit=20&prop=imageinfo&iiprop=url&format=json&origin=*`;
+        
+        try {
+            const res = await fetchWithTimeout(url, 5000);
+            const data = await res.json();
+            const pages = data.query?.pages;
+            
+            if (!pages) return [];
+            
+            let validImages = [];
+            
+            for (const key in pages) {
+                const imgInfo = pages[key].imageinfo?.[0];
+                const title = pages[key].title || "";
+                const imgUrl = imgInfo?.url;
+                
+                if (!imgUrl) continue;
+                
+                const lowerUrl = imgUrl.toLowerCase();
+                
+                // FATAL FILTER 1: Must be an actual photograph format
+                if (!lowerUrl.endsWith('.jpg') && !lowerUrl.endsWith('.jpeg') && !lowerUrl.endsWith('.png')) {
+                    continue;
+                }
+
+                // FATAL FILTER 2: No maps, flags, or logos
+                if (lowerUrl.includes('map') || lowerUrl.includes('flag') || lowerUrl.includes('logo') || lowerUrl.includes('icon')) {
+                    continue;
+                }
+
+                // Clean the title for comparison
+                let cleanTitle = title.replace(/^File:/i, '').replace(/\.[a-zA-Z0-9]+$/i, '').trim();
+                let lowerCleanTitle = cleanTitle.toLowerCase();
+                let lowerSearch = searchTerm.toLowerCase();
+                let wordCount = cleanTitle.split(/\s+/).length;
+
+                // FATAL FILTER 3: The title MUST contain the search term. (No more "Rank 3" catch-all)
+                if (lowerCleanTitle === lowerSearch) {
+                    validImages.push({ url: imgUrl, rank: 1, wordCount: wordCount }); // Exact match
+                } else if (lowerCleanTitle.includes(lowerSearch)) {
+                    validImages.push({ url: imgUrl, rank: 2, wordCount: wordCount }); // Contains name
+                }
+            }
+
+            // Sort what survived by Rank, then by shortest title
+            validImages.sort((a, b) => {
+                if (a.rank !== b.rank) return a.rank - b.rank; 
+                return a.wordCount - b.wordCount;              
+            });
+
+            return validImages.map(img => img.url);
+        } catch (e) {
+            return [];
+        }
+    }
+
+    // Step 3: Try searching by Capital City first
+    let urls = [];
+    if (capitalName) {
+        urls = await executeStrictWikiSearch(capitalName);
+    }
+
+    // Step 4: If Capital City search failed or returned NO strict matches, fallback to Country Name
+    if (urls.length === 0) {
+        console.log(`Strict search for capital failed. Trying country name: ${countryName}`);
+        urls = await executeStrictWikiSearch(countryName);
+    }
+
+    // Return the top 2 surviving URLs
+    return urls.slice(0, 2);
     }
 }
 
