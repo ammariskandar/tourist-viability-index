@@ -857,11 +857,17 @@ async function init() {
         if (loadingEl) loadingEl.innerText = "Error loading data.";
     }
     document.getElementById('downloadBtn').addEventListener('click', () => {
-    const isSolo = document.getElementById('soloToggle').checked;
-    
-    // Pass whatever array represents the CURRENT state of the screen
-    downloadCSV(sortedCountries, isSolo); 
-});
+        const soloToggle = document.getElementById('soloToggle');
+        const isSolo = soloToggle ? soloToggle.checked : false;
+        
+        // Scrape the exact list of countries currently visible on the page
+        const visibleCountries = Array.from(document.querySelectorAll('.country-name')).map(node => {
+            return { country: node.getAttribute('data-name') };
+        });
+
+        // Pass that scraped list into your CSV function
+        downloadCSV(visibleCountries, isSolo); 
+    });
 }
 
 function downloadCSV(currentData, isSoloMode) {
