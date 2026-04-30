@@ -757,6 +757,7 @@ function processAndRenderData() {
             isolationPenaltyText: calc.isolationPenaltyText,
             microstatePenaltyText: calc.microstatePenaltyText,
             eurocentricPenaltyText: calc.eurocentricPenaltyText,
+            soloBonusText: calc.soloBonusText,
             
             advisoryLevel: calc.advisoryLevel,
             advisoryWarning: calc.advisoryWarning,
