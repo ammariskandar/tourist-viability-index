@@ -351,22 +351,112 @@ async function fetchLiveAQI(isoCode) {
     return mockAqi;
 }
 
+
+
+// Store both your encoded keys here
 const PIXABAY_KEYS = {
-    primary: 'NTU2NDcwMDctZWM4NjNmZTY0NzIwY2ZhN2UxODQ1MDFiMg==',
+    primary: 'NTU2NDcwMDctZWM4NjNmZTY0NzIwY2ZhN2UxODQ1MDFiMg==', 
     backup: 'NTU2NDc0NjMtYmU2N2UwYzFhNDkyNGY0OTc1NGY3MWUxMg==' 
 };
 
 let activeKey = 'primary';
 const getPixabayKey = () => atob(PIXABAY_KEYS[activeKey]);
 
+// --- HELPER 1: Fetch with forced timeout ---
+async function fetchWithTimeout(url, timeoutMs = 4000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(id);
+    return response;
+}
+
+// --- HELPER 2: The Wikipedia Fallback Engine ---
+async function fetchWikipediaFallback(isoCode, countryName) {
+    let searchTerm = countryName;
+    
+    // Step 1: Get the Capital
+    try {
+        const rcRes = await fetchWithTimeout(`https://restcountries.com/v3.1/alpha/${isoCode}`, 3000);
+        if (rcRes.ok) {
+            const rcData = await rcRes.json();
+            if (rcData[0] && rcData[0].capital && rcData[0].capital[0]) {
+                searchTerm = rcData[0].capital[0]; 
+            }
+        }
+    } catch (e) {
+        console.warn("RestCountries failed, defaulting to country name for Wikipedia.");
+    }
+
+    // Step 2: Query Wikipedia
+    const searchQuery = encodeURIComponent(`${searchTerm} landmarks`);
+    const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${searchQuery}&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url&format=json&origin=*`;
+    
+    try {
+        const res = await fetchWithTimeout(url, 5000);
+        const data = await res.json();
+        const pages = data.query?.pages;
+        
+        if (!pages) return [];
+        
+        let validImages = [];
+        
+        for (const key in pages) {
+            const imgInfo = pages[key].imageinfo?.[0];
+            const title = pages[key].title || "";
+            const imgUrl = imgInfo?.url;
+            
+            if (!imgUrl) continue;
+            
+            const lowerUrl = imgUrl.toLowerCase();
+            // Filter out junk
+            if (lowerUrl.includes('.svg') || lowerUrl.includes('map') || lowerUrl.includes('flag') || lowerUrl.includes('logo') || lowerUrl.includes('icon')) {
+                continue;
+            }
+
+            // Step 3: Clean the title for ranking
+            // Removes "File:" at the start and ".jpg/.png" at the end
+            let cleanTitle = title.replace(/^File:/i, '').replace(/\.[a-zA-Z0-9]+$/i, '').trim();
+            let lowerCleanTitle = cleanTitle.toLowerCase();
+            let lowerSearch = searchTerm.toLowerCase();
+            let wordCount = cleanTitle.split(/\s+/).length;
+
+            // Step 4: Apply your Custom Ranking Algorithm
+            let rank = 3; // Default (Lowest Priority)
+            
+            if (lowerCleanTitle === lowerSearch) {
+                rank = 1; // Highest Priority: Exact match (e.g. "Mogadishu.jpg")
+            } else if (lowerCleanTitle.includes(lowerSearch)) {
+                rank = 2; // Medium Priority: Contains the name. We will use wordCount to sort these.
+            }
+            
+            validImages.push({ url: imgUrl, rank: rank, wordCount: wordCount });
+        }
+
+        // Step 5: Sort by Rank first, then by Word Count (Shorter titles are better)
+        validImages.sort((a, b) => {
+            if (a.rank !== b.rank) return a.rank - b.rank; // Sort by Rank 1, 2, 3
+            return a.wordCount - b.wordCount;              // If same rank, shorter title wins
+        });
+
+        // Return top 2 URLs
+        return validImages.slice(0, 2).map(img => img.url);
+        
+    } catch (e) {
+        console.error("Wikipedia fallback completely failed:", e);
+        return [];
+    }
+}
+
+// --- MAIN FETCH FUNCTION ---
 async function fetchCountryImages(countryName, isoCode) {
     const cacheKey = `pixabay_cache_${isoCode}`;
     const cachedData = localStorage.getItem(cacheKey);
 
+    // 1. Check 24-hour cache
     if (cachedData) {
         const parsedData = JSON.parse(cachedData);
         const ageInMilliseconds = Date.now() - parsedData.timestamp;
-
         if (ageInMilliseconds < 24 * 60 * 60 * 1000) {
             return parsedData.urls;
         }
@@ -375,42 +465,51 @@ async function fetchCountryImages(countryName, isoCode) {
     const searchQuery = encodeURIComponent(`${countryName} travel`);
     let url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
     
+    let urls = [];
+    let pixabaySuccess = false;
+
+    // 2. Try Pixabay
     try {
-        let res = await fetch(url);
-
-        if (res.status === 429) {
-            if (activeKey === 'primary') {
-                console.warn("Primary Pixabay key rate limited. Seamlessly switching to backup key...");
-                activeKey = 'backup'; // Swap the active key
-                url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
-                res = await fetch(url);
-            } else {
-                console.error("Both primary and backup Pixabay keys are rate limited.");
-                return [];
-            }
-        }
-
-        if (!res.ok) return [];
-
-        const data = await res.json();
+        let res = await fetchWithTimeout(url);
         
-        if (data.hits && data.hits.length > 0) {
-            let urls = [];
-            for (let i = 0; i < Math.min(2, data.hits.length); i++) {
-                urls.push(data.hits[i].webformatURL); 
-            }
-            localStorage.setItem(cacheKey, JSON.stringify({
-                urls: urls,
-                timestamp: Date.now()
-            }));
-            
-            return urls;
+        // Handle Rate Limit Swapping
+        if (res.status === 429 && activeKey === 'primary') {
+            console.warn("Primary Pixabay key limited. Switching to backup...");
+            activeKey = 'backup'; 
+            url = `https://pixabay.com/api/?key=${getPixabayKey()}&q=${searchQuery}&image_type=photo&orientation=horizontal&category=places&per_page=3`;
+            res = await fetchWithTimeout(url); // Try again with backup
         }
-        return []; 
+
+        if (res.ok) {
+            const data = await res.json();
+            // Make sure Pixabay actually found images (Fixes the Somalia blank/wrong image issue)
+            if (data.hits && data.hits.length > 0) {
+                for (let i = 0; i < Math.min(2, data.hits.length); i++) {
+                    urls.push(data.hits[i].webformatURL); 
+                }
+                pixabaySuccess = true;
+            }
+        }
     } catch (e) {
-        console.error("Pixabay fetch failed", e);
-        return [];
+        console.warn("Pixabay timed out or failed completely.");
     }
+
+    // 3. The Wikipedia Fallback
+    // Triggers if Pixabay timed out, threw a 429 on BOTH keys, or found 0 images
+    if (!pixabaySuccess || urls.length === 0) {
+        console.log(`Pixabay failed for ${countryName}. Triggering Wikipedia Fallback...`);
+        urls = await fetchWikipediaFallback(isoCode, countryName);
+    }
+
+    // 4. Cache the results (Only cache if we actually got images)
+    if (urls.length > 0) {
+        localStorage.setItem(cacheKey, JSON.stringify({
+            urls: urls,
+            timestamp: Date.now()
+        }));
+    }
+    
+    return urls;
 }
 
 function renderList(rankedCountries) {
