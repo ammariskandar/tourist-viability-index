@@ -389,7 +389,7 @@ async function fetchWikipediaFallback(isoCode, countryName) {
     }
 
     // Step 2: Query Wikipedia
-    const searchQuery = encodeURIComponent(`${searchTerm} landmarks`);
+    const searchQuery = encodeURIComponent(searchTerm);
     const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${searchQuery}&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url&format=json&origin=*`;
     
     try {
