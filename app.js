@@ -488,7 +488,7 @@ async function fetchCountryImages(countryName, isoCode) {
     const capitalName = await getCapitalCity(isoCode);
     
 
-    const stopWords = ['of', 'the', 'and', 'republic', 'democratic', 'united', 'states', 'kingdom', 'islands', 'island', 'central'];
+    const stopWords = ['of', 'the', 'and', 'republic', 'democratic', 'united', 'states', 'kingdom', 'islands', 'island', 'central','federation','people','virgin'];
     const requiredKeywords = countryName.toLowerCase().split(/[\s-]+/).filter(w => !stopWords.includes(w) && w.length > 2);
     if (capitalName) requiredKeywords.push(capitalName.toLowerCase());
 
@@ -790,10 +790,21 @@ function processAndRenderData() {
     const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
 
     const searchAliases = [
-    { target: "china", keywords: ["hong kong", "macao", "macau"] },
+    { target: "china", keywords: ["hong kong", "macao", "macau","hk","prc","people's republic of china"] },
     { target: "palestine", keywords: ["gaza", "west bank"] },
-    { target: "united kingdom", keywords: ["northern ireland", "scotland", "wales", "england"] },
-    { target: "united states", keywords: ["hawaii", "puerto rico", "guam"] }
+    { target: "united kingdom", keywords: ["northern ireland", "scotland", "wales", "england","uk","gb","great britain","gibraltar"] },
+    { target: "united states", keywords: ["hawaii", "puerto rico", "guam", "american samoa", "u.s.","us","usa","u.s.a","united states of america","america"] },
+    { target: "taiwan", keywords: ["taipei", "chinese taipei", "republic of china", "roc"] },
+    { target: "palestine", keywords: ["gaza", "west bank"] },
+    { target: "central african republic", keywords: ["c.a.r.", "car"] },
+    { target: "democratic republic of the congo", keywords: ["drc", "dr congo"] },
+    { target: "timor-leste", keywords: ["timor leste", "east timor"] },
+    { target: "north korea", keywords: ["dprk", "democratic people's republic of korea"] },
+    { target: "new zealand", keywords: ["nz"] },
+    { target: "united arab emirates", keywords: ["uae", "u.a.e","dubai","abu dhabi"] },
+    { target: "vatican city", keywords: ["pope", "pontifice","bishop of rome"] },
+    { target: "saudi arabia", keywords: ["kingdom of saudi arabia", "mecca", "medina"] },
+    { target: "south korea", keywords: ["republic of korea", "sk"] },
     ];
     
     if (searchTerm) {
