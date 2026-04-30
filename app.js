@@ -787,14 +787,36 @@ function processAndRenderData() {
     allCountriesData = processedData;
 
     const searchInput = document.getElementById('searchInput');
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
+
+    const searchAliases = [
+    { target: "china", keywords: ["hong kong", "macao", "macau"] },
+    { target: "palestine", keywords: ["gaza", "west bank"] },
+    { target: "united kingdom", keywords: ["northern ireland", "scotland", "wales", "england"] },
+    { target: "united states", keywords: ["hawaii", "puerto rico", "guam"] }
+    ];
     
     if (searchTerm) {
-        const filteredData = allCountriesData.filter(c => c.country.toLowerCase().includes(searchTerm));
-        renderList(filteredData);
-    } else {
-        renderList(allCountriesData);
-    }
+    const filteredData = allCountriesData.filter(c => {
+        const countryName = c.country.toLowerCase();
+
+        if (countryName.includes(searchTerm)) return true;
+
+        const aliasRule = searchAliases.find(rule => countryName.includes(rule.target));
+        if (aliasRule) {
+
+            if (aliasRule.keywords.some(keyword => keyword.includes(searchTerm))) {
+                return true;
+            }
+        }
+        
+        return false;
+    });
+    
+    renderList(filteredData);
+} else {
+    renderList(allCountriesData);
+}
 }
 
 async function init() {
