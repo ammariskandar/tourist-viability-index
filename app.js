@@ -544,7 +544,8 @@ async function fetchCountryImages(countryName, isoCode) {
     }
     
     return urls;
-}
+
+    }}
 
 function renderList(rankedCountries) {
     const container = document.getElementById('results-container');
