@@ -639,7 +639,7 @@ function renderList(rankedCountries) {
                 <div class="card-header">
                     <h2 style="margin: 0;">
                         <span class="rank-number">#${c.original_rank}</span> 
-                        <span class="country-name" data-name="${c.country}" data-iso="${c.iso_code}">${c.country}</span>${overtourismBadge}${c.hantaBadge || ''} <span class="status-indicator ${statusClass}">${statusText}</span>
+                        <span class="country-name" data-name="${c.country}" data-iso="${c.iso_code}">${c.country}</span>${overtourismBadge}${c.hantaBadge || ''} 
                         <span class="status-indicator ${statusClass}">${statusText}</span>
                         ${advisoryToast}
                     </h2>
@@ -904,7 +904,7 @@ async function init() {
         for (const country of staticData) {
             const liveAqi = await fetchLiveAQI(country.iso_code);
             const countryAdvisory = advisories[country.iso_code]; 
-            const hantaInfo = hantaDataMap[country.iso_code]; // Grab the Hanta data
+            country.hantaInfo = hantaDataMap[country.iso_code]; // Grab the Hanta data
             
             // Inject hantaInfo into the main payload
             rawCountriesData.push({ country, liveAqi, countryAdvisory, hantaInfo }); 
