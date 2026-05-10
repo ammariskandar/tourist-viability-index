@@ -276,6 +276,31 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         censorshipColor = "color: #e67e22;";
     }
 
+    let hantaStatus = "No active outbreak";
+    let hantaColor = "";
+    let hantaBadge = '';
+
+    if (country.hantaInfo) {
+        const sigs = country.hantaInfo.signals7d || 0;
+        
+        if (sigs >= 25) {
+            totalScore -= 100;
+            hantaStatus = `Critical Outbreak (-100)`;
+            hantaColor = "color: #900c3f; font-weight: bold;";
+            hantaBadge = `<a href="https://hantaflow.com/" target="_blank" style="text-decoration: none;"><span style="background-color: #900c3f; color: white; font-size: 12px; padding: 3px 8px; border-radius: 12px; margin-left: 10px; font-weight: bold; vertical-align: middle; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">☣️ Hantavirus: Critical</span></a>`;
+        } else if (sigs >= 15) {
+            totalScore -= 60;
+            hantaStatus = `Severe Outbreak (-60)`;
+            hantaColor = "color: #c0392b; font-weight: bold;";
+            hantaBadge = `<a href="https://hantaflow.com/" target="_blank" style="text-decoration: none;"><span style="background-color: #c0392b; color: white; font-size: 12px; padding: 3px 8px; border-radius: 12px; margin-left: 10px; font-weight: bold; vertical-align: middle; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">☣️ Hantavirus: Severe</span></a>`;
+        } else if (sigs >= 5) {
+            totalScore -= 15;
+            hantaStatus = `Moderate Outbreak (-15)`;
+            hantaColor = "color: #e67e22;";
+            hantaBadge = `<a href="https://hantaflow.com/" target="_blank" style="text-decoration: none;"><span style="background-color: #e67e22; color: white; font-size: 12px; padding: 3px 8px; border-radius: 12px; margin-left: 10px; font-weight: bold; vertical-align: middle; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">☣️ Hantavirus: Moderate</span></a>`;
+        }
+    }
+
     let connectivityStatus = "";
     let connectivityColor = "";
 
@@ -355,6 +380,9 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         overtourismColor: overtourismColor,
         censorshipStatus: censorshipStatus,
         censorshipColor: censorshipColor,
+        hantaStatus: hantaStatus,
+        hantaColor: hantaColor,
+        hantaBadge: hantaBadge,
         connectivityStatus: connectivityStatus,
         connectivityColor: connectivityColor,
         michelinStatus: michelinStatus,
@@ -611,7 +639,7 @@ function renderList(rankedCountries) {
                 <div class="card-header">
                     <h2 style="margin: 0;">
                         <span class="rank-number">#${c.original_rank}</span> 
-                        <span class="country-name" data-name="${c.country}" data-iso="${c.iso_code}">${c.country}</span>${overtourismBadge}
+                        <span class="country-name" data-name="${c.country}" data-iso="${c.iso_code}">${c.country}</span>${overtourismBadge}${c.hantaBadge || ''} <span class="status-indicator ${statusClass}">${statusText}</span>
                         <span class="status-indicator ${statusClass}">${statusText}</span>
                         ${advisoryToast}
                     </h2>
@@ -679,6 +707,10 @@ function renderList(rankedCountries) {
                         <div class="stat-box">
                             <span class="stat-label">Top 10 Most Michelin Stars?</span>
                             <span class="stat-value" style="${c.michelinColor}">${c.michelinStatus}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Hantavirus Risk (Live)</span>
+                            <span class="stat-value" style="${c.hantaColor || 'color: #27ae60;'}">${c.hantaStatus || 'No active outbreak'}</span>
                         </div>
                     </div>
                     <div style="margin-top: 10px;">
@@ -834,6 +866,7 @@ async function init() {
     try {
         const staticData = await fetchStaticData();
         
+        // --- 1. Fetch Travel Advisories ---
         let advisories = {};
         try {
             const advResponse = await fetch('https://smartraveller.kevle.xyz/api/advisories');
@@ -851,14 +884,35 @@ async function init() {
             console.warn("Smartraveller API unavailable. Continuing without live warnings.");
         }
 
+        // --- 2. Fetch Live Hantavirus Data ---
+        let hantaDataMap = {};
+        try {
+            const hantaRes = await fetch('https://hantaflow.com/api/signals.json');
+            if (hantaRes.ok) {
+                const hantaJson = await hantaRes.json();
+                if (hantaJson && hantaJson.byCountry) {
+                    hantaJson.byCountry.forEach(c => {
+                        hantaDataMap[c.iso2] = c;
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn("Hantaflow API unavailable. Continuing without live hantavirus data.");
+        }
+
+        // --- 3. Combine All Data Sources ---
         for (const country of staticData) {
             const liveAqi = await fetchLiveAQI(country.iso_code);
             const countryAdvisory = advisories[country.iso_code]; 
-            rawCountriesData.push({ country, liveAqi, countryAdvisory });
+            const hantaInfo = hantaDataMap[country.iso_code]; // Grab the Hanta data
+            
+            // Inject hantaInfo into the main payload
+            rawCountriesData.push({ country, liveAqi, countryAdvisory, hantaInfo }); 
         }
 
         processAndRenderData();
 
+        // --- UI Listeners ---
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.style.display = 'block';
@@ -879,12 +933,16 @@ async function init() {
         const loadingEl = document.getElementById('loading');
         if (loadingEl) loadingEl.innerText = "Error loading data.";
     }
+    
+    // --- CSV Download Listener ---
     document.getElementById('downloadBtn').addEventListener('click', () => {
         const soloToggle = document.getElementById('soloToggle');
         const isSolo = soloToggle ? soloToggle.checked : false;
+        
         const visibleCountries = Array.from(document.querySelectorAll('.country-name')).map(node => {
             return { country: node.getAttribute('data-name') };
         });
+        
         downloadCSV(visibleCountries, isSolo); 
     });
 }
