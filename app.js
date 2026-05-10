@@ -907,7 +907,7 @@ async function init() {
             country.hantaInfo = hantaDataMap[country.iso_code]; // Grab the Hanta data
             
             // Inject hantaInfo into the main payload
-            rawCountriesData.push({ country, liveAqi, countryAdvisory, hantaInfo }); 
+            rawCountriesData.push({ country, liveAqi, countryAdvisory }); 
         }
 
         processAndRenderData();
