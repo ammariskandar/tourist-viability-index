@@ -283,23 +283,27 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
     if (country.hantaInfo) {
         const sigs = country.hantaInfo.signals7d || 0;
         
-        if (sigs >= 25) {
+        if (sigs >= 40) {
             totalScore -= 100;
             hantaStatus = `Critical Outbreak (-100)`;
             hantaColor = "color: #900c3f; font-weight: bold;";
             hantaBadge = `<a href="https://hantaflow.com/" target="_blank" style="text-decoration: none;"><span style="background-color: #900c3f; color: white; font-size: 12px; padding: 3px 8px; border-radius: 12px; margin-left: 10px; font-weight: bold; vertical-align: middle; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">☣️ Hantavirus: Critical</span></a>`;
-        } else if (sigs >= 15) {
+        } else if (sigs >= 35) {
             totalScore -= 60;
             hantaStatus = `Severe Outbreak (-60)`;
             hantaColor = "color: #c0392b; font-weight: bold;";
             hantaBadge = `<a href="https://hantaflow.com/" target="_blank" style="text-decoration: none;"><span style="background-color: #c0392b; color: white; font-size: 12px; padding: 3px 8px; border-radius: 12px; margin-left: 10px; font-weight: bold; vertical-align: middle; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">☣️ Hantavirus: Severe</span></a>`;
-        } else if (sigs >= 5) {
+        } else if (sigs >= 15) {
             totalScore -= 15;
             hantaStatus = `Moderate Outbreak (-15)`;
             hantaColor = "color: #e67e22;";
             hantaBadge = `<a href="https://hantaflow.com/" target="_blank" style="text-decoration: none;"><span style="background-color: #e67e22; color: white; font-size: 12px; padding: 3px 8px; border-radius: 12px; margin-left: 10px; font-weight: bold; vertical-align: middle; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">☣️ Hantavirus: Moderate</span></a>`;
         }
     }
+
+    country.hantaStatus = hantaStatus;
+    country.hantaColor = hantaColor;
+    country.hantaBadge = hantaBadge;
 
     let connectivityStatus = "";
     let connectivityColor = "";
