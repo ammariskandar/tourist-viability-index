@@ -1,402 +1,601 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tourist Viability Index</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
-  <style>
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f9f9f9;
-      color: #111;
-      margin: 0;
-      padding: 2rem;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tourist Viability Index</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #0b0f1a;
+    --surface: #111827;
+    --surface-2: #1a2235;
+    --surface-3: #1f2d42;
+    --border: rgba(255,255,255,0.07);
+    --border-hover: rgba(255,255,255,0.14);
+    --text: #e8edf5;
+    --text-2: #8a9ab5;
+    --text-3: #4a5a72;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59,130,246,0.15);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.12);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,0.12);
+    --red: #ef4444;
+    --red-dim: rgba(239,68,68,0.12);
+    --red-deep: #7f1d1d;
+    --purple: #a78bfa;
+    --blue: #60a5fa;
+    --gold: #f59e0b;
+    --silver: #94a3b8;
+    --bronze: #cd7c3c;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --radius-xs: 5px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
+    --transition: 0.2s ease;
+    --font: 'Sora', system-ui, sans-serif;
+    --mono: 'DM Mono', monospace;
+}
 
-    .max-width {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+*, *::before, *::after { box-sizing: border-box; }
 
-    header h1 {
-      margin: 0 0 0.25rem;
-      line-height: 1.1;
-    }
+html { scroll-behavior: smooth; }
 
-    .intro-text {
-      font-size: 0.93rem;
-      font-style: italic;
-      color: #7f8c8d;
-      margin: -0.25rem 0 0.1rem;
-      line-height: 1.5;
-    }
+body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    line-height: 1.55;
+    min-height: 100vh;
+}
 
-    .subtitle {
-      font-size: 0.60rem;
-      color: #7f8c8d;
-      font-style: italic;
-      margin: 0 0 1.75rem;
-      line-height: 1.7;
-    }
+.hero {
+    position: relative;
+    padding: 4rem 2rem 3.5rem;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+}
 
-    .controls-container {
-      display: flex;
-      gap: 25px;
-      margin-top: 15px;
-      margin-bottom: 20px;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59,130,246,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 100%, rgba(99,102,241,0.08) 0%, transparent 60%),
+        linear-gradient(180deg, #0d1424 0%, var(--bg) 100%);
+    z-index: 0;
+}
 
-    .download-btn {
-      padding: 8px 14px;
-      cursor: pointer;
-      background-color: #2c3e50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      font-size: 14px;
-    }
+.hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1160px;
+    margin: 0 auto;
+}
 
-    .search-input {
-      padding: 8px;
-      width: 250px;
-      border: 1px solid #dcdcdc;
-      border-radius: 4px;
-      outline: none;
-    }
+.hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-glow);
+    border: 1px solid rgba(59,130,246,0.25);
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 1.25rem;
+}
 
-    .solo-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 16px;
-    }
+.hero h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: var(--text);
+}
 
-    .loading-message {
-      margin-bottom: 1.25rem;
-      color: #555;
-    }
+.hero h1 span {
+    background: linear-gradient(135deg, #60a5fa, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 
-    .page-footer {
-      text-align: center;
-      padding: 2rem 0 1rem;
-      margin-top: 3rem;
-      font-size: 0.9rem;
-      color: #7f8c8d;
-      border-top: 1px solid #eee;
-    }
+.hero-desc {
+    font-size: 0.875rem;
+    color: var(--text-2);
+    margin: 0 0 0.75rem;
+    max-width: 68ch;
+    line-height: 1.7;
+}
 
-    .page-footer a {
-      color: #3498db;
-      text-decoration: none;
-    }
+.hero-disclaimer {
+    font-size: 0.72rem;
+    color: var(--text-3);
+    font-style: italic;
+    margin: 0;
+}
 
-    .page-footer a:hover {
-      text-decoration: underline;
-    }
+.main {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 1.75rem 1.5rem 4rem;
+}
 
-    .footer-badge {
-      margin-bottom: 0.75rem;
-    }
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
 
-    .footer-badge img {
-      vertical-align: middle;
-    }
+.search-wrap {
+    flex: 1;
+    min-width: 180px;
+    position: relative;
+}
 
-    .country-card {
-      background: white;
-      padding: 1.5rem;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      flex-direction: column;
-    }
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-3);
+    pointer-events: none;
+    font-size: 0.85rem;
+}
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      cursor: pointer;
-      user-select: none;
-    }
+.search-input {
+    width: 100%;
+    padding: 10px 14px 10px 34px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
 
-    .card-header:hover h2 {
-      color: #3498db;
-    }
+.search-input::placeholder { color: var(--text-3); }
 
-    .details {
-      font-size: 0.85rem;
-      color: #666;
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px dashed #ddd;
-      display: none;
-    }
+.search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
 
-    .details.show {
-      display: block;
-    }
-
-    .score {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #2c3e50;
-    }
-
-    .penalty-flag {
-      color: #e74c3c;
-      font-weight: bold;
-    }
-
-    .status-highly-recommended {
-      color: #27ae60;
-      font-weight: bold;
-    }
-
-    .status-okay {
-      color: #f39c12;
-      font-weight: bold;
-    }
-
-    .status-avoid,
-    .status-danger {
-      color: #e74c3c;
-      font-weight: bold;
-    }
-
-    .status-danger {
-      color: #900c3f;
-    }
-
-    .status-indicator {
-      font-size: 1rem;
-      margin-left: 10px;
-      display: inline;
-    }
-
-    .advisory-toast {
-      font-size: 0.75rem;
-      margin-left: 10px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      border: 1px solid;
-      display: inline-flex;
-      align-items: center;
-      background-color: #fff;
-      vertical-align: middle;
-    }
-
-    .advisory-level-3 {
-      color: #e67e22;
-      border-color: #e67e22;
-    }
-
-    .advisory-level-4 {
-      color: #c0392b;
-      border-color: #c0392b;
-    }
-
-    .advisory-toast:hover {
-      opacity: 0.8;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .stat-box {
-      background: #f8f9fa;
-      border: 1px solid #eee;
-      padding: 10px;
-      border-radius: 6px;
-    }
-
-    .stat-label {
-      display: block;
-      font-size: 0.75rem;
-      color: #7f8c8d;
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      display: block;
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #2c3e50;
-    }
-
-    @keyframes shimmer {
-      0% {
-        background-position: -1000px 0;
-      }
-      100% {
-        background-position: 1000px 0;
-      }
-    }
-
-    .shimmer-box {
-      animation: shimmer 2s infinite linear;
-      background: linear-gradient(to right, #f6f7f8 4%, #edeef1 25%, #f6f7f8 36%);
-      background-size: 1000px 100%;
-      border-radius: 8px;
-      width: calc(50% - 5px);
-      height: 300px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .scroll-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 45px;
-    height: 45px;
-    background-color: #2c3e50;
-    color: white;
+.btn {
+    padding: 10px 16px;
     border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity var(--transition), transform 0.1s;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+.btn:active { transform: scale(0.96); }
+
+.btn-primary {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+}
+
+.btn-primary:hover {
+    border-color: var(--border-hover);
+    background: var(--surface-3);
+}
+
+.solo-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-2);
+    user-select: none;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--transition), color var(--transition);
+}
+
+.solo-label:hover { border-color: var(--border-hover); color: var(--text); }
+
+.solo-label input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+}
+
+.loading-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    color: var(--text-2);
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 2.5px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+    font-size: 0.875rem;
+    color: var(--text-3);
+}
+
+.country-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.country-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow);
+}
+
+.country-card.rank-1 { border-left: 3px solid var(--gold); }
+.country-card.rank-2 { border-left: 3px solid var(--silver); }
+.country-card.rank-3 { border-left: 3px solid var(--bronze); }
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    min-height: 64px;
+}
+
+.rank-num {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-3);
+    min-width: 2.25rem;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.rank-medal {
+    font-size: 1.3rem;
+    min-width: 2.25rem;
+    text-align: center;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.card-top {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.country-name-el {
+    font-size: 0.975rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    transition: color var(--transition);
+}
+
+.card-header:hover .country-name-el { color: var(--accent); }
+
+.status-pill {
+    font-size: 0.67rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.01em;
+    flex-shrink: 0;
+}
+
+.pill-green  { background: var(--green-dim);  color: var(--green); }
+.pill-amber  { background: var(--amber-dim);  color: var(--amber); }
+.pill-red    { background: var(--red-dim);    color: var(--red);   }
+.pill-danger { background: rgba(127,29,29,0.3); color: #fca5a5;   }
+
+.badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    letter-spacing: 0.01em;
+}
+
+.badge-overtour { background: rgba(245,158,11,0.15); color: var(--amber); border-color: rgba(245,158,11,0.25); }
+.badge-hanta-critical { background: rgba(127,29,29,0.35); color: #fca5a5; border-color: rgba(239,68,68,0.3); }
+.badge-hanta-severe   { background: var(--red-dim); color: var(--red); border-color: rgba(239,68,68,0.25); }
+.badge-hanta-moderate { background: var(--amber-dim); color: var(--amber); border-color: rgba(245,158,11,0.25); }
+
+.advisory-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: var(--radius-xs);
+    border: 1px solid;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+}
+
+.advisory-l3 { color: var(--amber); border-color: rgba(245,158,11,0.4); background: var(--amber-dim); }
+.advisory-l4 { color: var(--red);   border-color: rgba(239,68,68,0.4);  background: var(--red-dim); }
+
+.score-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.score-num {
+    font-family: var(--mono);
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+.score-green  { color: var(--green); }
+.score-amber  { color: var(--amber); }
+.score-red    { color: var(--red); }
+.score-danger { color: #fca5a5; }
+
+.expand-chevron {
+    color: var(--text-3);
+    font-size: 0.7rem;
+    transition: transform 0.25s ease, color var(--transition);
+    flex-shrink: 0;
+    margin-left: 4px;
+}
+
+.country-card.open .expand-chevron {
+    transform: rotate(180deg);
+    color: var(--accent);
+}
+
+.details {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+}
+
+.details.show {
+    grid-template-rows: 1fr;
+}
+
+.details-inner {
+    overflow: hidden;
+}
+
+.details-body {
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+}
+
+.images-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.125rem;
+}
+
+.shimmer-box {
+    flex: 1;
+    height: 200px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
+    background-size: 300% 100%;
+    animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+    0%   { background-position: 300% 0; }
+    100% { background-position: -300% 0; }
+}
+
+.country-img {
+    flex: 1;
+    height: 200px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 7px;
+    margin-bottom: 10px;
+}
+
+.stat-box {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 9px 12px;
+    border-radius: var(--radius-xs);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--text-3);
+    margin-bottom: 3px;
+    line-height: 1.35;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.stat-value {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.penalties {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 0.78rem;
+    margin-top: 8px;
+}
+
+.penalty-item { color: var(--red);   font-weight: 600; }
+.bonus-item   { color: var(--green); font-weight: 600; }
+
+.page-footer {
+    text-align: center;
+    padding: 2.5rem 1rem 1.5rem;
+    margin-top: 3rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--text-3);
+}
+
+.page-footer a { color: var(--accent); text-decoration: none; }
+.page-footer a:hover { text-decoration: underline; }
+
+.visitor-row { margin-bottom: 0.6rem; }
+
+.scroll-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 42px;
+    height: 42px;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1.5px solid var(--border);
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: var(--shadow);
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease;
+    transition: opacity 0.25s, visibility 0.25s, transform 0.15s, border-color var(--transition);
     z-index: 1000;
-    }
-    
-    .scroll-to-top.show {
-    opacity: 1;
-    visibility: visible;
-    }
+}
 
-    .scroll-to-top:hover {
-    transform: scale(1.1);
-    background-color: #34495e;
-    }
+.scroll-top.show { opacity: 1; visibility: visible; }
+.scroll-top:hover { transform: scale(1.1); border-color: var(--border-hover); }
 
-    .scroll-to-top svg {
-    width: 22px;
-    height: 22px;
-    }
-
-    @media (max-width: 700px) {
-      body {
-        padding: 1rem 0.5rem;
-      }
-
-      .subtitle {
-        display: none;
-      }
-
-      .country-card {
-        padding: 1rem;
-      }
-
-      .card-header h2 {
-        line-height: 1.2;
-      }
-
-      .country-name {
-        font-size: 60%;
-      }
-
-      .rank-number {
-        font-size: 58%;
-        margin-right: 2px;
-      }
-
-      .status-indicator {
-        display: block;
-        font-size: 0.6rem;
-        margin-left: 0;
-        margin-top: 5px;
-      }
-
-      .advisory-toast {
-        display: inline-block;
-        margin-left: 0;
-        margin-top: 5px;
-        font-size: 0.6rem;
-      }
-
-      .controls-container {
-        gap: 12px;
-      }
-
-      .download-btn {
-        padding: 6px 8px;
-        font-size: 5px;
-      }
-
-      .search-input {
-        width: 20%;
-        max-width: 150px;
-      }
-
-      .solo-label {
-        font-size: 10px;
-        gap: 5px;
-      }
-      .scroll-to-top {
-        bottom: 15px;
-        right: 15px;
-        width: 40px;
-        height: 40px;
-    }
-    }
-  </style>
+@media (max-width: 600px) {
+    .hero { padding: 2.25rem 1rem 2rem; }
+    .hero h1 { font-size: 1.5rem; letter-spacing: -0.03em; }
+    .hero-desc { font-size: 0.8rem; }
+    .main { padding: 1.25rem 0.875rem 3rem; }
+    .controls { gap: 7px; }
+    .search-input { font-size: 0.82rem; }
+    .btn { padding: 9px 12px; font-size: 0.78rem; }
+    .solo-label { font-size: 0.78rem; padding: 9px 11px; }
+    .card-header { padding: 0.875rem 1rem; gap: 10px; }
+    .country-name-el { font-size: 0.9rem; }
+    .score-num { font-size: 1.1rem; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .country-img, .shimmer-box { height: 140px; }
+    .scroll-top { bottom: 16px; right: 16px; width: 38px; height: 38px; }
+}
+</style>
 </head>
 <body>
-  <div class="max-width">
-    <header>
-      <h1>Recommended Countries for Travel</h1>
-      <p class="intro-text">
-        Please do your own further research and do not use this index as your sole source of information. We hold no responsibility for your travel decisions.
-      </p>
-      <p class="subtitle">
-        A comprehensive, data-driven index of global safety, livability, and accessibility. Base scores evaluate physical safety, geopolitical stability, severe crime risk, diplomatic mobility, and economic realities (GDP and Cost of Living). The model algorithmically corrects for institutional Eurocentric reporting bias and microstate statistical anomalies while applying strict penalties for active conflict zones, extreme isolation, and failing to report femicide data. Finally, the index rewards cultural and natural richness (UNESCO top sites, natural landscapes) and adjusts for inclusive travel accessibility (Muslim-friendly environments) to provide a truly holistic global ranking. Photos are provided by Pixabay and Wikipedia.
-      </p>
-    </header>
 
-    <div id="loading" class="loading-message">Loading data...</div>
+<div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-inner">
+        <div class="hero-eyebrow">🌍 Live Data Index</div>
+        <h1>Tourist <span>Viability</span> Index</h1>
+        <p class="hero-desc">
+            A comprehensive, data-driven ranking evaluating global safety, livability, and accessibility. Scores aggregate physical safety, geopolitical stability, severe crime metrics, diplomatic mobility, and economic realities — with algorithmic corrections for Eurocentric reporting bias and microstate statistical anomalies.
+        </p>
+        <p class="hero-disclaimer">For informational purposes only. Always conduct independent research before travelling. We hold no responsibility for travel decisions made using this index.</p>
+    </div>
+</div>
 
-    <div class="controls-container">
-      <button id="downloadBtn" class="download-btn">📥 CSV</button>
-      <input type="text" id="searchInput" class="search-input" placeholder="Search country..." hidden>
-      <label class="solo-label">
-        <input type="checkbox" id="soloToggle">
-        Solo Traveler Mode
-      </label>
+<div class="main">
+    <div class="controls">
+        <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search country, alias, or city…" style="display:none;" aria-label="Search countries">
+        </div>
+        <button id="downloadBtn" class="btn btn-primary">📥 Export CSV</button>
+        <label class="solo-label" title="Adjust scoring for solo travellers">
+            <input type="checkbox" id="soloToggle">
+            Solo Traveller Mode
+        </label>
     </div>
 
-    <main id="results-container"></main>
+    <div id="loading" class="loading-state">
+        <div class="spinner"></div>
+        <div class="loading-text">Fetching live data…</div>
+    </div>
+
+    <main id="results-container" aria-label="Country rankings" role="region"></main>
 
     <footer class="page-footer">
-      <div class="footer-badge">
-        <span>Total Explorers:</span>
-        <img src="https://visitor-badge.laobi.icu/badge?page_id=ammars-travel-index-8842" alt="Visitor Count">
-      </div>
-      <div>
-        Travel advisories powered by <a href="https://github.com/kevle1/smartraveller-api" target="_blank" rel="noopener noreferrer">Kevle's Smartraveller API</a>.
-      </div>
+        <div class="visitor-row">
+            Total Explorers: <img src="https://visitor-badge.laobi.icu/badge?page_id=ammars-travel-index-8842" alt="Visitor Count" loading="lazy" style="vertical-align:middle; margin-left:4px;">
+        </div>
+        <div>Travel advisories powered by <a href="https://github.com/kevle1/smartraveller-api" target="_blank" rel="noopener noreferrer">Kevle's Smartraveller API</a>.</div>
     </footer>
-  </div>
-  <button id="scrollToTopBtn" class="scroll-to-top" aria-label="Scroll to top">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="18 15 12 9 6 15"></polyline>
-        </svg>
-  </button>
-  <script src="app.js"></script>
+</div>
+
+<button id="scrollToTopBtn" class="scroll-top" aria-label="Scroll to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+</button>
+
+<script src="app.js"></script>
 </body>
 </html>
