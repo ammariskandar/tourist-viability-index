@@ -68,6 +68,55 @@
     --shadow-hover:  0 4px 14px rgba(0,0,0,0.38), 0 12px 32px rgba(0,0,0,0.25);
 }
 
+/* --- LOW TECH MODE OVERRIDES --- */
+html[data-low-tech="true"] body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: "Times New Roman", Times, serif !important;
+}
+
+html[data-low-tech="true"] * {
+    transition: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+html[data-low-tech="true"] .hero,
+html[data-low-tech="true"] .country-card,
+html[data-low-tech="true"] .stat-box,
+html[data-low-tech="true"] .search-input,
+html[data-low-tech="true"] .btn,
+html[data-low-tech="true"] .solo-label {
+    background: #ffffff !important;
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+}
+
+html[data-low-tech="true"] .country-images,
+html[data-low-tech="true"] .shimmer-box {
+    display: none !important; /* Immediately strips images to save bandwidth */
+}
+
+html[data-low-tech="true"] .status-indicator,
+html[data-low-tech="true"] .advisory-toast,
+html[data-low-tech="true"] .hero-eyebrow,
+html[data-low-tech="true"] span[style*="background-color"] {
+    background: transparent !important;
+    border: 1px dashed #000000 !important;
+    color: #000000 !important;
+}
+
+html[data-low-tech="true"] a, 
+html[data-low-tech="true"] .card-header:hover .country-name {
+    color: #0000ee !important;
+    text-decoration: underline !important;
+}
+
+html[data-low-tech="true"] .score,
+html[data-low-tech="true"] .stat-value {
+    color: #000000 !important;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
@@ -574,12 +623,14 @@ a { color: var(--accent); }
 </head>
 <body>
 
+<script async src="https://code.nightnight.xn--q9jyb4c/nn.js?sleep=0000&wake=0500"></script>
+
 <div class="hero">
     <div class="hero-inner">
         <div class="hero-left">
             <div class="hero-eyebrow">🌍 Live Data Index</div>
             <h1>Tourist <em>Viability</em> Index</h1>
-            <p class="hero-desc">A data-driven ranking evaluating global safety, livability, and accessibility across 190+ countries. Scores combine physical safety, geopolitical stability, crime metrics, diplomatic mobility, and economic realities — with algorithmic corrections for Eurocentric reporting bias.</p>
+            <p class="hero-desc" id="heroDesc">A data-driven ranking evaluating global safety, livability, and accessibility across 190+ countries. Scores combine physical safety, geopolitical stability, crime metrics, diplomatic mobility, and economic realities — with algorithmic corrections for Eurocentric reporting bias.</p>
             <p class="hero-disclaimer">For informational purposes only. Always conduct independent research before travelling. We hold no responsibility for decisions made using this index.</p>
         </div>
         <div class="hero-stats">
@@ -606,6 +657,7 @@ a { color: var(--accent); }
             <input type="checkbox" id="soloToggle">
             Solo Mode
         </label>
+        <button id="lowTechToggle" class="btn theme-btn" aria-label="Toggle low-tech mode" title="Toggle low-tech mode">🔋</button>
         <button id="themeToggle" class="btn theme-btn" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
     </div>
 
@@ -622,6 +674,10 @@ a { color: var(--accent); }
             <img src="https://visitor-badge.laobi.icu/badge?page_id=ammars-travel-index-8842" alt="Visitor Count" loading="lazy" style="vertical-align:middle; margin-left:4px;">
         </div>
         <div>Travel advisories via <a href="https://github.com/kevle1/smartraveller-api" target="_blank" rel="noopener noreferrer">Smartraveller API</a> · Hantavirus signals via <a href="https://hantaflow.com" target="_blank" rel="noopener noreferrer">Hantaflow</a></div>
+        <div style="margin-top: 8px; font-size: 0.75rem;">
+            🌙 To encourage healthy rest, this site sleeps from 12:00 AM to 5:00 AM. 
+            (<a href="#" id="demoNightNight">Force Demo Mode</a>)
+        </div>
     </footer>
 </div>
 
@@ -649,12 +705,51 @@ a { color: var(--accent); }
 
 <script>
 (function () {
+    const toggle = document.getElementById('lowTechToggle');
+    const html   = document.documentElement;
+    const desc   = document.getElementById('heroDesc');
+
+    const standardText = "A data-driven ranking evaluating global safety, livability, and accessibility across 190+ countries. Scores combine physical safety, geopolitical stability, crime metrics, diplomatic mobility, and economic realities — with algorithmic corrections for Eurocentric reporting bias.";
+    const lowTechText = "A data-driven ranking evaluating global safety, livability, and accessibility across 190+ countries. This is the low-tech, environmentally-friendly mode of the website. Heavy visuals and images are stripped to minimize bandwidth and power consumption.";
+
+    const saved = localStorage.getItem('tvi-lowtech');
+    if (saved === 'true') {
+        html.setAttribute('data-low-tech', 'true');
+        desc.textContent = lowTechText;
+    }
+
+    toggle.addEventListener('click', function () {
+        const isLowTech = html.getAttribute('data-low-tech') === 'true';
+        if (isLowTech) {
+            html.removeAttribute('data-low-tech');
+            desc.textContent = standardText;
+            localStorage.setItem('tvi-lowtech', 'false');
+        } else {
+            html.setAttribute('data-low-tech', 'true');
+            desc.textContent = lowTechText;
+            localStorage.setItem('tvi-lowtech', 'true');
+        }
+    });
+})();
+</script>
+
+<script>
+(function () {
     const btn = document.getElementById('scrollToTopBtn');
     window.addEventListener('scroll', function () {
         btn.classList.toggle('show', window.scrollY > 300);
     });
     btn.addEventListener('click', function () {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    // Night Night Demo Trigger
+    document.getElementById('demoNightNight').addEventListener('click', function(e) {
+        e.preventDefault();
+        const script = document.createElement('script');
+        // This injects the exact demo endpoint from their documentation
+        script.src = "https://code.nightnight.xn--q9jyb4c/nn.js?sleep=0901&wake=0900";
+        document.body.appendChild(script);
     });
 })();
 </script>
