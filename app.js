@@ -1,3 +1,4 @@
+let userBucketList = JSON.parse(localStorage.getItem('tvi-bucketlist')) || [];
 let allCountriesData = [];
 let rawCountriesData = [];
 let scoreCache      = null;
@@ -464,6 +465,9 @@ function renderList(rankedCountries) {
         }
 
         const displayScore = c.final_score.toFixed(2);
+        const isInBucket = userBucketList.includes(c.country);
+        const bucketBtnText = isInBucket ? '✓ Added to Bucket List' : '➕ Add to Bucket List';
+        const bucketBtnClass = isInBucket ? 'bucket-add-btn added' : 'bucket-add-btn';
 
         html += `
 <div class="country-card">
@@ -478,6 +482,7 @@ function renderList(rankedCountries) {
     </div>
     <div class="details">
         <div class="country-images" style="display:flex;gap:10px;margin-bottom:0;width:100%;"></div>
+        <button class="${bucketBtnClass}" data-country="${c.country}">${bucketBtnText}</button>
         <div class="stats-grid">
             <div class="stat-box"><span class="stat-label">General Risk (Higher is Worse)</span><span class="stat-value">${c.scores_raw.gpi}</span></div>
             <div class="stat-box"><span class="stat-label">Geopolitical Situation Risk (Higher is Worse)</span><span class="stat-value">${c.scores_raw.gti}</span></div>
@@ -567,6 +572,8 @@ async function init() {
         }));
 
         processAndRenderData();
+
+        updateBucketUI();
 
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
@@ -741,3 +748,86 @@ async function fetchCountryImages(countryName, isoCode) {
 }
 
 init();
+
+function updateBucketUI() {
+    const icon = document.getElementById('bucketIcon');
+    const count = document.getElementById('bucketCount');
+    if (userBucketList.length === 0) {
+        icon.classList.add('empty');
+    } else {
+        icon.classList.remove('empty');
+    }
+    count.textContent = userBucketList.length;
+}
+
+function toggleBucketItem(countryName) {
+    const index = userBucketList.indexOf(countryName);
+    if (index > -1) {
+        userBucketList.splice(index, 1);
+    } else {
+        userBucketList.push(countryName);
+    }
+    localStorage.setItem('tvi-bucketlist', JSON.stringify(userBucketList));
+    updateBucketUI();
+    processAndRenderData();
+}
+
+document.getElementById('bucketIcon').addEventListener('click', () => {
+    const modal = document.getElementById('bucketModal');
+    const listContainer = document.getElementById('bucketListContainer');
+    listContainer.innerHTML = '';
+    
+    userBucketList.forEach(c => {
+        const li = document.createElement('li');
+        li.textContent = c;
+        listContainer.appendChild(li);
+    });
+    
+    modal.classList.add('show');
+});
+
+document.getElementById('closeModalBtn').addEventListener('click', () => {
+    document.getElementById('bucketModal').classList.remove('show');
+});
+
+document.getElementById('bucketCsvBtn').addEventListener('click', () => {
+    if (userBucketList.length === 0) return;
+    let csv = 'Bucket List\n';
+    userBucketList.forEach(c => { csv += `"${c}"\n`; });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'my_bucket_list.csv';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+});
+
+document.getElementById('bucketPrintBtn').addEventListener('click', () => {
+    window.print();
+});
+
+function getShareText() {
+    return encodeURIComponent("My Travel Bucket List:\n" + userBucketList.join('\n'));
+}
+
+document.getElementById('shareXBtn').addEventListener('click', () => {
+    window.open(`https://twitter.com/intent/tweet?text=${getShareText()}`, '_blank');
+});
+
+document.getElementById('shareThreadsBtn').addEventListener('click', () => {
+    window.open(`https://threads.net/intent/post?text=${getShareText()}`, '_blank');
+});
+
+document.getElementById('shareFbBtn').addEventListener('click', () => {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+});
+document.getElementById('results-container').addEventListener('click', (e) => {
+        if (e.target.classList.contains('bucket-add-btn')) {
+            const country = e.target.getAttribute('data-country');
+            toggleBucketItem(country);
+            e.stopPropagation();
+        }
+    });

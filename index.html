@@ -619,11 +619,162 @@ a { color: var(--accent); }
     .shimmer-box, .country-images img { height: 140px; width:45%; }
     .scroll-top { bottom: 14px; right: 14px; }
 }
+.bucket-icon {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    z-index: 1000;
+    transition: filter var(--t), transform 0.2s;
+}
+.bucket-icon.empty {
+    filter: grayscale(100%);
+    opacity: 0.7;
+}
+.bucket-icon:active {
+    transform: scale(0.9);
+}
+.bucket-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: var(--red);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    display: none;
+}
+.bucket-icon:not(.empty) .bucket-count {
+    display: block;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 2000;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+.modal-content {
+    background: var(--surface);
+    padding: 25px;
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: var(--shadow-hover);
+    color: var(--text);
+}
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--text-2);
+}
+.bucket-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 15px 0;
+}
+.bucket-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+}
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.modal-share {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+}
+.share-btn {
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    font-size: 12px;
+}
+.x-btn { background: #000000; }
+.threads-btn { background: #000000; }
+.fb-btn { background: #1877F2; }
+.bucket-add-btn {
+    display: block;
+    margin: 15px auto;
+    padding: 8px 16px;
+    background: var(--accent);
+    color: var(--surface);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+    cursor: pointer;
+}
+.bucket-add-btn.added {
+    background: var(--green);
+}
+html[data-low-tech="true"] .bucket-icon {
+    filter: none !important;
+}
+@media print {
+    body > *:not(#bucketModal) { display: none !important; }
+    #bucketModal { position: static !important; background: none !important; opacity: 1 !important; visibility: visible !important; }
+    .modal-content { box-shadow: none !important; width: 100% !important; max-width: 100% !important; border: none !important; }
+    .modal-close, .modal-actions, .modal-share { display: none !important; }
+}
 </style>
 </head>
 <body>
 
 <script async src="https://code.nightnight.xn--q9jyb4c/nn.js?sleep=0000&wake=0500"></script>
+
+<div id="bucketIcon" class="bucket-icon empty" title="View Bucket List">
+    🪣<span id="bucketCount" class="bucket-count">0</span>
+</div>
+
+<div id="bucketModal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="closeModalBtn" class="modal-close">✖</button>
+        <h2>My Bucket List</h2>
+        <ul id="bucketListContainer" class="bucket-list"></ul>
+        <div class="modal-actions">
+            <button id="bucketCsvBtn" class="btn">📥 CSV</button>
+            <button id="bucketPrintBtn" class="btn">🖨️ Print</button>
+        </div>
+        <div class="modal-share">
+            <span>Share:</span>
+            <button id="shareXBtn" class="share-btn x-btn">🕮 X</button>
+            <button id="shareThreadsBtn" class="share-btn threads-btn">@ Threads</button>
+            <button id="shareFbBtn" class="share-btn fb-btn">📘 FB</button>
+        </div>
+    </div>
+</div>
 
 <div class="hero">
     <div class="hero-inner">
@@ -743,11 +894,9 @@ a { color: var(--accent); }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     
-    // Night Night Demo Trigger
     document.getElementById('demoNightNight').addEventListener('click', function(e) {
         e.preventDefault();
         const script = document.createElement('script');
-        // This injects the exact demo endpoint from their documentation
         script.src = "https://code.nightnight.xn--q9jyb4c/nn.js?sleep=0901&wake=0900";
         document.body.appendChild(script);
     });
