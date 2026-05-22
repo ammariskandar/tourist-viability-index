@@ -809,21 +809,20 @@ document.getElementById('bucketPrintBtn').addEventListener('click', () => {
     window.print();
 });
 
-function getShareText() {
-    return encodeURIComponent("My Travel Bucket List:\n" + userBucketList.join('\n'));
+function getShareText(isRaw = false) {
+    const list = "My Travel Bucket List:\n" + userBucketList.join('\n');
+    return isRaw ? list : encodeURIComponent(list);
 }
 
 document.getElementById('shareXBtn').addEventListener('click', () => {
-    window.open(`https://twitter.com/intent/tweet?text=${getShareText()}`, '_blank');
+    window.open(`https://twitter.com/intent/tweet?text=${getShareText(false)}`, '_blank');
 });
 
 document.getElementById('shareThreadsBtn').addEventListener('click', () => {
-    window.open(`https://threads.net/intent/post?text=${getShareText()}`, '_blank');
+    const text = getShareText(true);
+    window.open(`https://threads.net/intent/post?text=${encodeURIComponent(text)}`, '_blank');
 });
 
-document.getElementById('shareFbBtn').addEventListener('click', () => {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
-});
 document.getElementById('results-container').addEventListener('click', (e) => {
         if (e.target.classList.contains('bucket-add-btn')) {
             const country = e.target.getAttribute('data-country');
