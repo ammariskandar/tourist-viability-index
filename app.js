@@ -822,6 +822,19 @@ document.getElementById('shareThreadsBtn').addEventListener('click', () => {
     window.open(`https://threads.net/intent/post?text=${getShareText()}`, '_blank');
 });
 
+document.getElementById('bucketAiBtn').addEventListener('click', () => {
+    if (userBucketList.length === 0) return alert("Your bucket list is empty!");
+
+    const promptText = `I have a travel bucket list, based on rankings on https://ammariskandar.github.io/tourist-viability-index/ and I need some help planning my trip(s). Here is/are my list of countries:\n\n` + 
+                       userBucketList.map(c => `- ${c}`).join('\n') + 
+                       `\n\nCan you help me create an itinerary, identify the best time to visit, and/or suggest hidden gems for these countries?`;
+
+    navigator.clipboard.writeText(promptText).then(() => {
+        alert("Prompt copied to clipboard! Now Claude...");
+        window.open('https://claude.ai/', '_blank');
+    });
+});
+
 document.getElementById('results-container').addEventListener('click', (e) => {
         if (e.target.classList.contains('bucket-add-btn')) {
             const country = e.target.getAttribute('data-country');
