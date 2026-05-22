@@ -809,18 +809,17 @@ document.getElementById('bucketPrintBtn').addEventListener('click', () => {
     window.print();
 });
 
-function getShareText(isRaw = false) {
+function getShareText() {
     const list = "My Travel Bucket List:\n" + userBucketList.join('\n');
-    return isRaw ? list : encodeURIComponent(list);
+    return encodeURIComponent(list);
 }
 
 document.getElementById('shareXBtn').addEventListener('click', () => {
-    window.open(`https://twitter.com/intent/tweet?text=${getShareText(false)}`, '_blank');
+    window.open(`https://twitter.com/intent/tweet?text=${getShareText()}`, '_blank');
 });
 
 document.getElementById('shareThreadsBtn').addEventListener('click', () => {
-    const text = getShareText(true);
-    window.open(`https://threads.net/intent/post?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://threads.net/intent/post?text=${getShareText()}`, '_blank');
 });
 
 document.getElementById('results-container').addEventListener('click', (e) => {
