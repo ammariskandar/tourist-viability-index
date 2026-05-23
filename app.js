@@ -586,7 +586,7 @@ function renderList(rankedCountries) {
             <div class="stat-box"><span class="stat-label">Language Accessibility (EN/FR/CN/MSA)</span><span class="stat-value" style="${c.langBonusColor}">${c.langBonusStatus}</span></div>
             <div class="stat-box"><span class="stat-label">Tap Water Safety (EPI)</span><span class="stat-value" style="${c.waterColor}">${c.waterStatus}</span></div>
             <div class="stat-box"><span class="stat-label">Road Traffic Safety</span><span class="stat-value" style="${c.roadColor}">${c.roadStatus}</span></div>
-            <div class="stat-box"><span class="stat-label">Racial & Cultural Diversity</span><span class="stat-value" style="${c.diversityColor}">${c.diversityStatus}</span></div>
+            <div class="stat-box"><span class="stat-label">Cultural Diversity</span><span class="stat-value" style="${c.diversityColor}">${c.diversityStatus}</span></div>
         </div>
         <div style="padding:0.5rem 0 0.25rem;display:flex;flex-direction:column;gap:3px;">
             ${femicideText}${isolationText}${microText}${euroText}${soloText}
