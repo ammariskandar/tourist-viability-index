@@ -241,12 +241,12 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
         unescoCombinedColor  = 'color: #27ae60;';
     } else if (!UNESCO_MIN_6.includes(country.iso_code)) {
         if (MICROSTATES.includes(country.iso_code)) {
-            totalScore -= 10;
-            unescoCombinedStatus = 'Less than 6 Sites (Microstate, -10)';
+            totalScore -= 5;
+            unescoCombinedStatus = 'Less than 6 Sites (Microstate, -5)';
             unescoCombinedColor  = 'color: #ef6f00;';
         } else {
-            totalScore -= 15;
-            unescoCombinedStatus = 'Less than 6 Sites (-15)';
+            totalScore -= 10;
+            unescoCombinedStatus = 'Less than 6 Sites (-10)';
             unescoCombinedColor  = 'color: #c0392b;';
         }
     }
@@ -282,11 +282,11 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
     if (OVERTOURISM_NATIONS.includes(country.iso_code)) {
         const isMicro = MICROSTATES.includes(country.iso_code);
         if (isSoloMode) {
-            totalScore      -= isMicro ? 20 : 30;
-            overtourismStatus = isMicro ? 'Yes (-20, but Microstate)' : 'Yes (-30)';
+            totalScore      -= isMicro ? 15 : 25;
+            overtourismStatus = isMicro ? 'Yes (-15, but Microstate)' : 'Yes (-25)';
         } else {
-            totalScore      -= isMicro ? 10 : 20;
-            overtourismStatus = isMicro ? 'Yes (-10, but Microstate)' : 'Yes (-20)';
+            totalScore      -= isMicro ? 5 : 10;
+            overtourismStatus = isMicro ? 'Yes (-5, but Microstate)' : 'Yes (-10)';
         }
         overtourismColor = isMicro ? 'color: #e67e22;' : 'color: #c0392b;';
     }
