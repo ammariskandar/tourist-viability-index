@@ -384,21 +384,21 @@ let hantaStatus = 'No active outbreak', hantaColor = '', hantaBadge = '';
     let langBonusColor = '';
     
     if (LANG_TIER_5.includes(country.iso_code)) {
-        totalScore += 5;
-        langBonusStatus = 'Optimal (+5)';
+        totalScore += 2.5;
+        langBonusStatus = 'Very High (+2.5)';
         langBonusColor = 'color: var(--green);';
     } else if (LANG_TIER_4_5.includes(country.iso_code)) {
-        totalScore += 4.5;
-        langBonusStatus = 'High (+4.5)';
+        totalScore += 1.5;
+        langBonusStatus = 'High (+1.5)';
         langBonusColor = 'color: var(--green);';
     }
 
-    let waterStatus = 'Average (0)';
+    let waterStatus = 'Safe (0)';
     let waterColor = '';
     
     if (WATER_SAFE.includes(country.iso_code)) {
-        totalScore += 5;
-        waterStatus = 'Safe to Drink (+5)';
+        totalScore += 1.5;
+        waterStatus = 'Very Safe (+1.5)';
         waterColor = 'color: var(--green);';
     } else if (WATER_RISK_HIGH.includes(country.iso_code)) {
         totalScore -= 15;
@@ -410,12 +410,12 @@ let hantaStatus = 'No active outbreak', hantaColor = '', hantaBadge = '';
     let roadColor = '';
 
     if (ROAD_DEATHS_LOW.includes(country.iso_code)) {
-        totalScore += 2.5;
-        roadStatus = 'Very Safe (+2.5)';
+        totalScore += 1.5;
+        roadStatus = 'Very Safe (+1.5)';
         roadColor = 'color: var(--green);';
     } else if (ROAD_DEATHS_HIGH.includes(country.iso_code)) {
         totalScore -= 2.5;
-        roadStatus = 'High Fatality Rate (-2.5)';
+        roadStatus = 'Very Unsafe (-2.5)';
         roadColor = 'color: #e67e22;';
     }
 
