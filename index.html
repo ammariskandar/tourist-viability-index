@@ -94,7 +94,7 @@ html[data-low-tech="true"] .solo-label {
 
 html[data-low-tech="true"] .country-images,
 html[data-low-tech="true"] .shimmer-box {
-    display: none !important; /* Immediately strips images to save bandwidth */
+    display: none !important; 
 }
 
 html[data-low-tech="true"] .status-indicator,
@@ -619,6 +619,7 @@ a { color: var(--accent); }
     .shimmer-box, .country-images img { height: 140px; width:45%; }
     .scroll-top { bottom: 14px; right: 14px; }
 }
+
 .bucket-icon {
     position: fixed;
     top: 20px;
@@ -650,6 +651,7 @@ a { color: var(--accent); }
 .bucket-icon:not(.empty) .bucket-count {
     display: block;
 }
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -662,7 +664,7 @@ a { color: var(--accent); }
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    z-index: 2000;
+    z-index: 9999;
     transition: opacity 0.3s, visibility 0.3s;
 }
 .modal-overlay.show {
@@ -671,7 +673,7 @@ a { color: var(--accent); }
 }
 .modal-content {
     background: var(--surface);
-    padding: 25px;
+    padding: 45px 25px 25px; 
     border-radius: var(--radius);
     width: 90%;
     max-width: 400px;
@@ -726,8 +728,6 @@ a { color: var(--accent); }
     flex: 1;
     text-align: center;
 }
-.x-btn { background: #000000; }
-.threads-btn { background: #000000; }
 .bucket-add-btn {
     display: block;
     margin: 15px auto;
@@ -773,27 +773,6 @@ html[data-low-tech="true"] .bucket-icon {
 
 <div id="bucketIcon" class="bucket-icon empty" title="View Bucket List">
     🪣<span id="bucketCount" class="bucket-count">0</span>
-</div>
-
-<div class="modal-content">
-    <button id="closeModalBtn" class="modal-close">✖</button>
-    <button id="clearBucketBtn" class="modal-clear-btn">🗑️ Clear</button>
-        <h2>My Bucket List</h2>
-        <ul id="bucketListContainer" class="bucket-list"></ul>
-        <div class="modal-actions">
-            <button id="bucketCsvBtn" class="btn">📥 CSV</button>
-            <button id="bucketPrintBtn" class="btn">🖨️ Print</button>
-        </div>
-        <div class="modal-share">
-            <span>Share:</span>
-            <button id="shareXBtn" class="share-btn x-btn">X Twitter</button>
-            <button id="shareThreadsBtn" class="share-btn threads-btn">@ Threads</button>
-        </div>
-        <div class="modal-share">
-            <span>Share to AI:</span>
-            <button id="bucketAiBtn" class="btn" style="background: #6a1b9a; color: white; border: none;">🤖 Generate Prompt</button>
-        </div>        
-    </div>
 </div>
 
 <div class="hero">
@@ -850,6 +829,28 @@ html[data-low-tech="true"] .bucket-icon {
             (<a href="#" id="demoNightNight">Force Demo Mode</a>)
         </div>
     </footer>
+</div>
+
+<div id="bucketModal" class="modal-overlay">
+    <div class="modal-content">
+        <button id="closeModalBtn" class="modal-close">✖</button>
+        <button id="clearBucketBtn" class="modal-clear-btn">🗑️ Clear</button>
+        <h2>My Bucket List</h2>
+        <ul id="bucketListContainer" class="bucket-list"></ul>
+        <div class="modal-actions">
+            <button id="bucketCsvBtn" class="btn">📥 CSV</button>
+            <button id="bucketPrintBtn" class="btn">🖨️ Print</button>
+        </div>
+        <div class="modal-share">
+            <span>Share:</span>
+            <button id="shareXBtn" class="share-btn x-btn">X Twitter</button>
+            <button id="shareThreadsBtn" class="share-btn threads-btn">@ Threads</button>
+        </div>
+        <div class="modal-share">
+            <span>Share to AI:</span>
+            <button id="bucketAiBtn" class="btn" style="background: #6a1b9a; color: white; border: none;">🤖 Generate Prompt</button>
+        </div>        
+    </div>
 </div>
 
 <button id="scrollToTopBtn" class="scroll-top" aria-label="Scroll to top">▲</button>
