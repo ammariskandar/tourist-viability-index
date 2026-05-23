@@ -25,6 +25,33 @@ const IATA_TOP_20         = ['US','GB','CN','DE','JP','ES','IT','AE','FR','IN','
 const IATA_21_80          = ['VN','AU','ID','NL','CH','QA','PT','GR','PH','EG','IE','PL','RU','AT','DK','BR','PK','BE','MA','SE','DO','NO','CO','KW','FI','RO','IL','CZ','HU','NZ','PA','BD','AR','ZA','ET','CY','BH','OM','LK','DZ','IR','JO','HR','PE','RS','KH','CL','CR','UZ','TN','LB','KZ','MO','IQ','MV','JM','IS','NP','KE','BG'];
 const IATA_81_100         = ['MT','SV','AZ','GE','AL','BS','NG','EC','CU','GT','LV','MU','LU','MD','TZ','LT','AW','LA','MM','AM'];
 const MICHELIN_TOP_10     = ['FR','AE','IT','JP','DE','ES','US','GB','CH','CN'];
+const LANG_TIER_5 = [
+    // English Native
+    'GB', 'US', 'AU', 'NZ', 'CA', 'IE',
+    // English Very High Proficiency
+    'NL', 'HR', 'AT', 'DE', 'NO', 'PT', 'DK', 'SE', 'BE', 'SK', 'RO', 'FI', 'ZA', 'ZW', 'PL',
+    // Chinese Native/Official
+    'CN', 'TW', 'SG',
+    // Spanish Native/Official
+    'DO', 'SV', 'CR', 'CO', 'PR', 'HN', 'UY', 'AR', 'CU', 'VE', 'NI', 'MX', 'CL', 'GT', 'ES', 'PA', 'PE', 'BO', 'EC', 'GQ', 'PY',
+    // Arabic Native/Official
+    'DZ', 'BH', 'TD', 'KM', 'DJ', 'EG', 'IQ', 'JO', 'KW', 'LB', 'LY', 'ML', 'MR', 'MA', 'OM', 'PS', 'QA', 'SA', 'SO', 'SD', 'SY', 'TN', 'AE', 'YE'
+];
+
+const LANG_TIER_4_5 = [
+    // English Second/Common Third
+    'LV', 'MK', 'BG', 'KE', 'GR', 'BA', 'HU', 'CZ', 'MY', 'RS', 'ZM', 'PH', 'NG', 'CH', 'EE', 'HN',
+    // Chinese Second/Common Third 
+    'TH', 'VN',
+    // Arabic Second/Common Third
+    'CY', 'ER', 'IR', 'NE', 'SN'
+];
+
+const WATER_RISK_HIGH = ['TD','CF','LS','NE','MG','NG','BF','ER','BI','MW','TG','SL','HT','SZ','ML','LR','ET','ZW','NA','GW','GN','BJ','BW','MZ','TZ','KE','PG','KI','ZM','AO','CM','UG','ZA','IN','RW','GM','DJ','KM','MR','GH','PK','SN'];
+const WATER_SAFE      = ['DE','GB','IT','GR','CH','FI','IE','NO','LU','CA','IS','AU','AT','SG','PT','SE','MT','ES','ME'];
+const ROAD_DEATHS_HIGH = ['GN','LY','HT','GW','SY','ZW','YE','KM','KE','NP','BF','DO','TD','GH','CF','TH'];
+const ROAD_DEATHS_LOW  = ['MV','NO','SG','MT','SE','DK','GB','CH','IS','AD','JP','IE','DE','NL','ES','BN','CY','LU','IL','FI','EE','AU','BE','AT','FR','CA','PS','VC','IT','TT','CZ','FJ','CU','MK','SI','AE','SM','KI','LT','SK','GD','TR','PL','NZ','SC','KR','PT','GR','PA','QA','HU','BY','RS','AG','TM','NR','HR','BH','BG','CG','TO','AR','LC','MD','ME','KW','UZ','EG','MR','RO','WS','PH','LB','MU','LV','BB'];
+const DIVERSITY_HIGH = ['LR','UG','TG','NP','ZA','KE','TD','ML','NG','GW','PH','ID','TL','SL','MW','CF','GA','ET','AO','BF','KW','BJ','AF','GM','NA','PK','SN','SD','IR','GH','CI','CA','GN','MR','QA','ZM','CG','CD','GY','AE','ES','NE','ER','TT','BT','DJ','CO','BA','LA','PE','PA','OM','BE','TZ','MM','MX','BH','BO','MY','MA','MK','BR','LV','NI','KZ','EC','FJ','US','TR','VE','CU','GT'];
 
 const SOLO_TIERS = {
     S: { points: 15,  codes: ['SG','JP','AU','NZ','AE'] },
@@ -353,6 +380,54 @@ let hantaStatus = 'No active outbreak', hantaColor = '', hantaBadge = '';
         }
     }
 
+    let langBonusStatus = 'Standard (+0)';
+    let langBonusColor = '';
+    
+    if (LANG_TIER_5.includes(country.iso_code)) {
+        totalScore += 5;
+        langBonusStatus = 'Optimal (+5)';
+        langBonusColor = 'color: var(--green);';
+    } else if (LANG_TIER_4_5.includes(country.iso_code)) {
+        totalScore += 4.5;
+        langBonusStatus = 'High (+4.5)';
+        langBonusColor = 'color: var(--green);';
+    }
+
+    let waterStatus = 'Average (0)';
+    let waterColor = '';
+    
+    if (WATER_SAFE.includes(country.iso_code)) {
+        totalScore += 5;
+        waterStatus = 'Safe to Drink (+5)';
+        waterColor = 'color: var(--green);';
+    } else if (WATER_RISK_HIGH.includes(country.iso_code)) {
+        totalScore -= 15;
+        waterStatus = 'Unsafe / High Risk (-15)';
+        waterColor = 'color: #c0392b; font-weight: bold;';
+    }
+
+    let roadStatus = 'Average (0)';
+    let roadColor = '';
+
+    if (ROAD_DEATHS_LOW.includes(country.iso_code)) {
+        totalScore += 2.5;
+        roadStatus = 'Very Safe (+2.5)';
+        roadColor = 'color: var(--green);';
+    } else if (ROAD_DEATHS_HIGH.includes(country.iso_code)) {
+        totalScore -= 2.5;
+        roadStatus = 'High Fatality Rate (-2.5)';
+        roadColor = 'color: #e67e22;';
+    }
+
+    let diversityStatus = 'Standard (0)';
+    let diversityColor = '';
+
+    if (DIVERSITY_HIGH.includes(country.iso_code)) {
+        totalScore += 5;
+        diversityStatus = 'Highly Diverse (+5)';
+        diversityColor = 'color: var(--green);';
+    }
+
     totalScore = isSoloMode
         ? Math.max(0, totalScore * 0.80)
         : Math.max(0, totalScore);
@@ -387,6 +462,14 @@ let hantaStatus = 'No active outbreak', hantaColor = '', hantaBadge = '';
         unescoCombinedStatus,
         unescoCombinedColor,
         soloBonusText,
+        langBonusStatus,
+        langBonusColor,
+        waterStatus,
+        waterColor,
+        roadStatus,
+        roadColor,
+        diversityStatus,
+        diversityColor
     };
 }
 
@@ -500,6 +583,10 @@ function renderList(rankedCountries) {
             <div class="stat-box"><span class="stat-label">Flight Connectivity (IATA Rank)</span><span class="stat-value" style="${c.connectivityColor}">${c.connectivityStatus}</span></div>
             <div class="stat-box"><span class="stat-label">Top 10 Most Michelin Stars?</span><span class="stat-value" style="${c.michelinColor}">${c.michelinStatus}</span></div>
             <div class="stat-box"><span class="stat-label">Hantavirus Risk (Live)</span><span class="stat-value" style="${c.hantaColor || 'color:#27ae60;'}">${c.hantaStatus || 'No active outbreak'}</span></div>
+            <div class="stat-box"><span class="stat-label">Language Accessibility (EN/FR/CN/MSA)</span><span class="stat-value" style="${c.langBonusColor}">${c.langBonusStatus}</span></div>
+            <div class="stat-box"><span class="stat-label">Tap Water Safety (EPI)</span><span class="stat-value" style="${c.waterColor}">${c.waterStatus}</span></div>
+            <div class="stat-box"><span class="stat-label">Road Traffic Safety</span><span class="stat-value" style="${c.roadColor}">${c.roadStatus}</span></div>
+            <div class="stat-box"><span class="stat-label">Racial & Cultural Diversity</span><span class="stat-value" style="${c.diversityColor}">${c.diversityStatus}</span></div>
         </div>
         <div style="padding:0.5rem 0 0.25rem;display:flex;flex-direction:column;gap:3px;">
             ${femicideText}${isolationText}${microText}${euroText}${soloText}
