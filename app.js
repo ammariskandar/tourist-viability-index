@@ -221,18 +221,6 @@ function calculateFinalScore(country, liveAqi, advisoryData, isSoloMode = false)
     else if (raw.passport_vfs < 50) { totalScore -= 10; isolationPenaltyText = '*High inaccessibility penalty applied (-10)'; }
     else if (raw.passport_vfs < 55) { totalScore -= 5;  isolationPenaltyText = '*Moderate inaccessibility penalty applied (-5)'; }
 
-    let microstatePenaltyText = '';
-    if (MICROSTATES.includes(country.iso_code)) {
-        totalScore -= 7.77;
-        microstatePenaltyText = '*Microstate score penalty applied (-7.77)';
-    }
-
-    let eurocentricPenaltyText = '';
-    if (EUROCENTRIC_NATIONS.includes(country.iso_code)) {
-        totalScore -= totalScore * 0.03;
-        eurocentricPenaltyText = '*Eurocentric reporting adjustment applied (-3%)';
-    }
-
     let advisoryLevel = null, advisoryWarning = null;
     if (advisoryData) {
         if (advisoryData.level >= 4) {
@@ -426,6 +414,18 @@ let hantaStatus = 'No active outbreak', hantaColor = '', hantaBadge = '';
         totalScore += 5;
         diversityStatus = 'Highly Diverse (+5)';
         diversityColor = 'color: var(--green);';
+    }
+
+    let microstatePenaltyText = '';
+    if (MICROSTATES.includes(country.iso_code)) {
+        totalScore -= 7.77;
+        microstatePenaltyText = '*Microstate score penalty applied (-7.77)';
+    }
+
+    let eurocentricPenaltyText = '';
+    if (EUROCENTRIC_NATIONS.includes(country.iso_code)) {
+        totalScore -= totalScore * 0.05;
+        eurocentricPenaltyText = '*Eurocentric reporting adjustment applied (-5%)';
     }
 
     totalScore = isSoloMode
