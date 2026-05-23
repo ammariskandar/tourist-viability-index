@@ -745,6 +745,20 @@ a { color: var(--accent); }
 html[data-low-tech="true"] .bucket-icon {
     filter: none !important;
 }
+.modal-clear-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: none;
+    border: none;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: var(--red);
+    font-weight: 600;
+}
+.modal-clear-btn:hover {
+    text-decoration: underline;
+}
 @media print {
     body > *:not(#bucketModal) { display: none !important; }
     #bucketModal { position: static !important; background: none !important; opacity: 1 !important; visibility: visible !important; }
@@ -761,9 +775,9 @@ html[data-low-tech="true"] .bucket-icon {
     🪣<span id="bucketCount" class="bucket-count">0</span>
 </div>
 
-<div id="bucketModal" class="modal-overlay">
-    <div class="modal-content">
-        <button id="closeModalBtn" class="modal-close">✖</button>
+<div class="modal-content">
+    <button id="closeModalBtn" class="modal-close">✖</button>
+    <button id="clearBucketBtn" class="modal-clear-btn">🗑️ Clear</button>
         <h2>My Bucket List</h2>
         <ul id="bucketListContainer" class="bucket-list"></ul>
         <div class="modal-actions">
@@ -776,8 +790,8 @@ html[data-low-tech="true"] .bucket-icon {
             <button id="shareThreadsBtn" class="share-btn threads-btn">@ Threads</button>
         </div>
         <div class="modal-share">
-            <span>Generate AI Prompt:</span>
-            <button id="bucketAiBtn" class="btn" style="background: #6a1b9a; color: white; border: none;">🤖 Copy to Clipboard</button>
+            <span>Share to AI:</span>
+            <button id="bucketAiBtn" class="btn" style="background: #6a1b9a; color: white; border: none;">🤖 Generate Prompt</button>
         </div>        
     </div>
 </div>

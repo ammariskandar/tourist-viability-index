@@ -842,3 +842,13 @@ document.getElementById('results-container').addEventListener('click', (e) => {
             e.stopPropagation();
         }
     });
+
+document.getElementById('clearBucketBtn').addEventListener('click', () => {
+    if (confirm("Are you sure you want to clear your entire bucket list?")) {
+        userBucketList = [];
+        localStorage.setItem('tvi-bucketlist', JSON.stringify(userBucketList));
+        updateBucketUI();
+        document.getElementById('bucketListContainer').innerHTML = '';
+        processAndRenderData();
+    }
+});
