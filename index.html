@@ -94,7 +94,7 @@ html[data-low-tech="true"] .solo-label {
 
 html[data-low-tech="true"] .country-images,
 html[data-low-tech="true"] .shimmer-box {
-    display: none !important; 
+    display: none !important;
 }
 
 html[data-low-tech="true"] .status-indicator,
@@ -106,7 +106,7 @@ html[data-low-tech="true"] span[style*="background-color"] {
     color: #000000 !important;
 }
 
-html[data-low-tech="true"] a, 
+html[data-low-tech="true"] a,
 html[data-low-tech="true"] .card-header:hover .country-name {
     color: #0000ee !important;
     text-decoration: underline !important;
@@ -294,6 +294,36 @@ a { color: var(--accent); }
     padding: 9px 14px;
     font-size: 1rem;
     line-height: 1;
+}
+
+.spicy-btn {
+    padding: 9px 18px;
+    background: linear-gradient(135deg, #e63946, #ff6b35);
+    border: 1.5px solid #e63946;
+    border-radius: var(--radius-sm);
+    color: #fff;
+    font-family: var(--font);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.spicy-btn:hover {
+    transform: scale(1.04);
+    box-shadow: 0 2px 12px rgba(230,57,70,0.4);
+}
+.spicy-btn:active {
+    transform: scale(0.96);
+}
+.spicy-btn i {
+    font-style: italic;
+}
+[data-theme="dark"] .spicy-btn {
+    background: linear-gradient(135deg, #c1121f, #e85d04);
+    border-color: #c1121f;
 }
 
 .solo-label {
@@ -673,7 +703,7 @@ a { color: var(--accent); }
 }
 .modal-content {
     background: var(--surface);
-    padding: 45px 25px 25px; 
+    padding: 45px 25px 25px;
     border-radius: var(--radius);
     width: 90%;
     max-width: 400px;
@@ -692,6 +722,105 @@ a { color: var(--accent); }
     font-size: 18px;
     cursor: pointer;
     color: var(--text-2);
+    z-index: 10;
+}
+
+.spicy-modal-content {
+    max-width: 580px;
+    padding: 50px 28px 28px;
+    text-align: left;
+}
+
+.spicy-score-badge {
+    position: absolute;
+    top: 16px;
+    right: 45px;
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: var(--radius-xs);
+    background: var(--accent-bg);
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+    z-index: 10;
+}
+
+.spicy-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 2px;
+    letter-spacing: -0.03em;
+}
+
+.spicy-country {
+    font-size: 0.85rem;
+    color: var(--text-3);
+    margin: 0 0 14px;
+    font-weight: 500;
+}
+
+.spicy-images {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.spicy-images img {
+    width: 50%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background: var(--surface-3);
+}
+
+.spicy-why {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text);
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent);
+}
+
+.spicy-why strong {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+    margin-bottom: 4px;
+}
+
+.spicy-howto {
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--text-2);
+    padding: 12px 14px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--green);
+}
+
+.spicy-howto strong {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+    margin-bottom: 4px;
+}
+
+@media (max-width: 640px) {
+    .spicy-modal-content {
+        max-width: 95%;
+        padding: 44px 16px 20px;
+    }
+    .spicy-title { font-size: 1.25rem; }
+    .spicy-images img { height: 120px; }
+    .spicy-score-badge { font-size: 0.95rem; padding: 3px 10px; right: 40px; }
 }
 .bucket-list {
     list-style-type: none;
@@ -809,6 +938,7 @@ html[data-low-tech="true"] .bucket-icon {
         </label>
         <button id="lowTechToggle" class="btn theme-btn" aria-label="Toggle low-tech mode" title="Toggle low-tech mode">🔋</button>
         <button id="themeToggle" class="btn theme-btn" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+        <button id="spicyBtn" class="spicy-btn" title="Surprise me!">🌶️ I am feeling <i>SPICY</i></button>
     </div>
 
     <div id="loading" class="loading-state">
@@ -825,7 +955,7 @@ html[data-low-tech="true"] .bucket-icon {
         </div>
         <div>Travel advisories via <a href="https://github.com/kevle1/smartraveller-api" target="_blank" rel="noopener noreferrer">Smartraveller API</a> · Hantavirus signals via <a href="https://hantaflow.com" target="_blank" rel="noopener noreferrer">Hantaflow</a></div>
         <div style="margin-top: 8px; font-size: 0.75rem;">
-            🌙 To encourage healthy rest, this site sleeps from 12:00 AM to 5:00 AM. 
+            🌙 To encourage healthy rest, this site sleeps from 12:00 AM to 5:00 AM.
             (<a href="#" id="demoNightNight">Force Demo Mode</a>)
         </div>
     </footer>
@@ -846,12 +976,25 @@ html[data-low-tech="true"] .bucket-icon {
             <button id="shareXBtn" class="share-btn x-btn">X Twitter</button>
             <button id="shareThreadsBtn" class="share-btn threads-btn">@ Threads</button>
         </div>
-        
+
         <div class="modal-share" style="margin-top: 10px;">
             <span>Share to AI:</span>
             <button id="bucketAiBtn" class="btn" style="background: #6a1b9a; color: white; border: none;">🤖 Generate Prompt</button>
         </div>
-        </div>        
+        </div>
+    </div>
+</div>
+
+<div id="spicyModal" class="modal-overlay">
+    <div class="modal-content spicy-modal-content">
+        <button id="spicyCloseBtn" class="modal-close">✖</button>
+        <div id="spicyScore" class="spicy-score-badge"></div>
+        <h2 id="spicyTitle" class="spicy-title"></h2>
+        <p id="spicyCountry" class="spicy-country"></p>
+        <div id="spicyImages" class="spicy-images"></div>
+        <div id="spicyWhy" class="spicy-why"></div>
+        <div id="spicyHowTo" class="spicy-howto"></div>
+        <button id="spicyReRoll" class="btn" style="margin:15px auto 0;display:block;">🎲 Roll Again</button>
     </div>
 </div>
 
@@ -916,7 +1059,7 @@ html[data-low-tech="true"] .bucket-icon {
     btn.addEventListener('click', function () {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-    
+
     document.getElementById('demoNightNight').addEventListener('click', function(e) {
         e.preventDefault();
         const script = document.createElement('script');
