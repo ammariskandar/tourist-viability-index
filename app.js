@@ -2342,12 +2342,19 @@ function openSpicyPlace(place) {
         : rounded >= 45
           ? "var(--amber-bg)"
           : "var(--red-bg)";
-    scoreBadge.textContent = "Score: " + rounded;
+    scoreBadge.innerHTML =
+      '<span style="font-size:0.6rem;opacity:0.7;display:block;text-align:right;line-height:1.2;">' +
+      place.country +
+      "</span>Score: " +
+      rounded;
     scoreBadge.style.background = bg;
     scoreBadge.style.color = color;
     scoreBadge.style.borderColor = color;
   } else {
-    scoreBadge.textContent = "N/A";
+    scoreBadge.innerHTML =
+      '<span style="font-size:0.6rem;opacity:0.7;display:block;text-align:right;line-height:1.2;">' +
+      place.country +
+      "</span>N/A";
     scoreBadge.style.background = "var(--surface-2)";
     scoreBadge.style.color = "var(--text-3)";
     scoreBadge.style.borderColor = "var(--border)";
